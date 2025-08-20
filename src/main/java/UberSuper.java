@@ -40,7 +40,7 @@ public class UberSuper {
         int i = Integer.parseInt(parts[1]);
 
         try {
-            if(inputList.get(i - 1) == null) {
+            if(i > inputList.size()) {
                 throw new UberExceptions("There's no such task in the list");
             }
             Task t = inputList.get(i - 1);
@@ -50,15 +50,16 @@ public class UberSuper {
             System.out.print(t + "\n");
             printLine();
         } catch (UberExceptions e) {
+            printLine();
             System.out.print(e.getMessage() + "\n");
-        }
+            printLine();        }
     }
 
     private static void unmark(String input) {
         String[] parts = input.split("\\s+", 2);
         int i = Integer.parseInt(parts[1]);
         try{
-            if(inputList.get(i - 1) == null) {
+            if(i > inputList.size()) {
                 throw new UberExceptions("There's no such task in the list");
             }
             Task t = inputList.get(i - 1);
@@ -68,12 +69,15 @@ public class UberSuper {
             System.out.print(t + "\n");
             printLine();
         } catch (UberExceptions e) {
+            printLine();
             System.out.print(e.getMessage() + "\n");
+            printLine();
         }
 
     }
 
     private static void todo(String input){
+
         try {
             String[] parts = input.split("\\s+", 2);
             if (parts.length < 2) {
@@ -123,7 +127,7 @@ public class UberSuper {
         }
     }
 
-    private static void list(){
+    private static void list() {
         printLine();
         int listNum = 1;
         System.out.print("Here are the tasks in your list:\n");
@@ -132,6 +136,29 @@ public class UberSuper {
             listNum++;
         }
         printLine();
+    }
+
+    private static void delete(String input) {
+        String[] parts = input.split("\\s+", 2);
+        int i = Integer.parseInt(parts[1]);
+        try{
+            if(i > inputList.size()) {
+                throw new UberExceptions("You're deleting something that doesn't exist");
+            }
+            Task t = inputList.get(i - 1);
+            inputList.remove(i - 1);
+            String message = String.format("You now have %d tasks in the list \n", inputList.size());
+            printLine();
+            System.out.print("Ok, I've removed this task from the list: \n");
+            System.out.print(t + "\n");
+            System.out.print(message);
+            printLine();
+        } catch (UberExceptions e) {
+            printLine();
+            System.out.print(e.getMessage() + "\n");
+            printLine();
+        }
+
     }
     private static void echo() {
         while (sc.hasNextLine()) {
@@ -152,6 +179,8 @@ public class UberSuper {
                     deadline(input);
                 } else if (input.startsWith("event")) {
                     event(input);
+                } else if (input.startsWith("delete")) {
+                    delete(input);
                 } else {
                     throw new UberExceptions("What's up?");
                 }
