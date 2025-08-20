@@ -1,0 +1,7 @@
+todo sleep
+mark 1
+event sleep /from now /to later
+unmark 1
+mark 2
+deadline sleep /by 12am
+list
