@@ -7,7 +7,7 @@ public class UberSuper {
 
     public static void main(String[] args) {
         greet();
-        goodBye();
+        echo();
     }
 
     private static void printLine() {
@@ -24,4 +24,18 @@ public class UberSuper {
         System.out.print("Bye. Hope to see you again soon! \n");
         printLine();
     }
+    private static void echo() {
+        while (sc.hasNextLine()) {
+            String input = sc.nextLine().trim();
+            if (input.equals("bye")) {
+                goodBye();
+                break;
+            } else {
+                printLine();
+                System.out.print(input + "\n");
+                printLine();
+            }
+        }
+    }
+
 }
