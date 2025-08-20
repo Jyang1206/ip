@@ -1,9 +1,11 @@
 import java.util.Scanner;
+import java.util.ArrayList;
 
 public class UberSuper {
     private static final String botName = "UberSuper";
     private static final String line = "_________________________________";
     private static final Scanner sc = new Scanner(System.in);
+    private static ArrayList<String> inputList = new ArrayList<String>(100);
 
     public static void main(String[] args) {
         greet();
@@ -25,14 +27,23 @@ public class UberSuper {
         printLine();
     }
     private static void echo() {
+        int listNum = 1;
         while (sc.hasNextLine()) {
             String input = sc.nextLine().trim();
             if (input.equals("bye")) {
                 goodBye();
                 break;
-            } else {
+            } else if (input.equals("list")) {
                 printLine();
-                System.out.print(input + "\n");
+                for (String s : inputList) {
+                    System.out.print(s);
+                }
+                printLine();
+            } else {
+                inputList.add(listNum + ". " + input + "\n");
+                listNum++;
+                printLine();
+                System.out.print("added: " + input + "\n");
                 printLine();
             }
         }
