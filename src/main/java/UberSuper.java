@@ -38,53 +38,89 @@ public class UberSuper {
     private static void mark(String input) {
         String[] parts = input.split("\\s+", 2);
         int i = Integer.parseInt(parts[1]);
+
         try {
+            if(inputList.get(i - 1) == null) {
+                throw new UberExceptions("There's no such task in the list");
+            }
             Task t = inputList.get(i - 1);
             t.mark();
             printLine();
             System.out.print("Nice! I've marked this task as done: \n");
             System.out.print(t + "\n");
             printLine();
-        } catch (Exception e) {
-            System.out.print("There's no such item \n");
+        } catch (UberExceptions e) {
+            System.out.print(e.getMessage() + "\n");
         }
-
     }
 
     private static void unmark(String input) {
         String[] parts = input.split("\\s+", 2);
         int i = Integer.parseInt(parts[1]);
         try{
+            if(inputList.get(i - 1) == null) {
+                throw new UberExceptions("There's no such task in the list");
+            }
             Task t = inputList.get(i - 1);
             t.unmark();
             printLine();
             System.out.print("Ok, I've marked this task as not done yet: \n");
             System.out.print(t + "\n");
             printLine();
-        } catch (Exception e) {
-            System.out.print("There's no such task in the list \n");
+        } catch (UberExceptions e) {
+            System.out.print(e.getMessage() + "\n");
         }
 
     }
 
-    private static void todo(String input) {
-        String[] parts = input.split("\\s+", 2);
-        add(new Todo(parts[1]));
+    private static void todo(String input){
+        try {
+            String[] parts = input.split("\\s+", 2);
+            if (parts.length < 2) {
+                throw new UberExceptions("You forgot to include what you're supposed to do");
+            }
+            add(new Todo(parts[1]));
+        } catch (UberExceptions e) {
+            printLine();
+            System.out.print(e.getMessage() + "\n");
+            printLine();
+        }
     }
 
     private static void deadline(String input) {
-        String[] parts = input.split("/");
-        String desc = parts[0].replaceFirst("deadline", "").trim();
-        String dl = parts[1].replaceFirst("by", "(by:");
-        add(new Deadline(desc, dl + ")"));
+        try {
+            String[] parts = input.split("/");
+            if (parts.length < 2) {
+                throw new UberExceptions("Provide a proper deadline,");
+            }
+            String desc = parts[0].replaceFirst("deadline", "").trim();
+            String dl = parts[1].replaceFirst("by", "(by:");
+            add(new Deadline(desc, dl + ")"));
+        } catch (UberExceptions e){
+            printLine();
+            System.out.print(e.getMessage() + "\n");
+            printLine();
+        }
+
     }
 
     private static void event(String input) {
-        String[] parts = input.split("/");
-        String desc = parts[0].replaceFirst("event", "").trim();
-        String startTime = parts[1].replaceFirst("from", "(from:");
-        String endTime = parts[2].replaceFirst("to", "to:");
-        add(new Event(desc, startTime, endTime + ")"));
+        try {
+            String[] parts = input.split("/");
+            if (parts.length < 2) {
+                throw new UberExceptions("There's nothing happening whenever");
+            } else if (parts.length < 3) {
+                throw new UberExceptions("So when does it end?");
+            }
+            String desc = parts[0].replaceFirst("event", "").trim();
+            String startTime = parts[1].replaceFirst("from", "(from:");
+            String endTime = parts[2].replaceFirst("to", "to:");
+            add(new Event(desc, startTime, endTime + ")"));
+        } catch (UberExceptions e){
+            printLine();
+            System.out.print(e.getMessage() + "\n");
+            printLine();
+        }
     }
 
     private static void list(){
@@ -100,24 +136,28 @@ public class UberSuper {
     private static void echo() {
         while (sc.hasNextLine()) {
             String input = sc.nextLine().trim();
-            if (input.equals("bye")) {
-                goodBye();
-                break;
-            } else if (input.equals("list")) {
-                list();
-            } else if (input.startsWith("mark ")) {
-                mark(input);
-            } else if (input.startsWith("unmark ")) {
-                unmark(input);
-            } else if (input.startsWith("todo ")){
-                todo(input);
-            } else if (input.startsWith("deadline")) {
-                deadline(input);
-            } else if (input.startsWith("event")) {
-                event(input);
-            } else {
+            try {
+                if (input.equals("bye")) {
+                    goodBye();
+                    break;
+                } else if (input.equals("list")) {
+                    list();
+                } else if (input.startsWith("mark")) {
+                    mark(input);
+                } else if (input.startsWith("unmark")) {
+                    unmark(input);
+                } else if (input.startsWith("todo")) {
+                    todo(input);
+                } else if (input.startsWith("deadline")) {
+                    deadline(input);
+                } else if (input.startsWith("event")) {
+                    event(input);
+                } else {
+                    throw new UberExceptions("What's up?");
+                }
+            } catch (UberExceptions e) {
                 printLine();
-                System.out.print(input + "\n");
+                System.out.print(e.getMessage() + "\n");
                 printLine();
             }
         }
@@ -177,6 +217,12 @@ public class UberSuper {
         @Override
         public String toString() {
             return String.format("[E][%s] %s %s %s", done() ? "X" : "", desc(), this.startTime, this.endTime);
+        }
+    }
+
+    private static class UberExceptions extends Exception {
+        public UberExceptions(String message) {
+            super(message);
         }
     }
 }
