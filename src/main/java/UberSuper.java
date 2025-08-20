@@ -163,26 +163,44 @@ public class UberSuper {
     private static void echo() {
         while (sc.hasNextLine()) {
             String input = sc.nextLine().trim();
+            CommandType command = CommandType.fromInput(input);
             try {
-                if (input.equals("bye")) {
-                    goodBye();
-                    break;
-                } else if (input.equals("list")) {
-                    list();
-                } else if (input.startsWith("mark")) {
-                    mark(input);
-                } else if (input.startsWith("unmark")) {
-                    unmark(input);
-                } else if (input.startsWith("todo")) {
-                    todo(input);
-                } else if (input.startsWith("deadline")) {
-                    deadline(input);
-                } else if (input.startsWith("event")) {
-                    event(input);
-                } else if (input.startsWith("delete")) {
-                    delete(input);
-                } else {
-                    throw new UberExceptions("What's up?");
+                switch (command) {
+                    case BYE:
+                        goodBye();
+                        return;
+
+                    case LIST:
+                        list();
+                        break;
+
+                    case MARK:
+                        mark(input);
+                        break;
+
+                    case UNMARK:
+                        unmark(input);
+                        break;
+
+                    case TODO:
+                        todo(input);
+                        break;
+
+                    case DEADLINE:
+                        deadline(input);
+                        break;
+
+                    case EVENT:
+                        event(input);
+                        break;
+
+                    case DELETE:
+                        delete(input);
+                        break;
+
+                    case UNKNOWN:
+                    default:
+                        throw new UberExceptions("Sorry! I have no idea what you're trying to do.");
                 }
             } catch (UberExceptions e) {
                 printLine();
@@ -195,9 +213,11 @@ public class UberSuper {
     private static class Task {
         private boolean isDone = false;
         private final String description;
+        private final TaskType type;
 
-        public Task(String description) {
+        public Task(String description, TaskType type) {
             this.description = description;
+            this.type = type;
 
         }
         public void mark() {this.isDone = true;}
@@ -206,52 +226,104 @@ public class UberSuper {
         public String desc() {return description;}
         @Override
         public String toString() {
-            return String.format("[%s] %s", isDone ? "X" : "", description);
+            return String.format("[%s][%s] %s",
+                    type.getSymbol(),
+                    isDone ? "X" : "",
+                    description);
         }
     }
 
     private static class Todo extends Task {
         public Todo(String description) {
-            super(description);
+            super(description, TaskType.TODO);
         }
-
-        @Override
-        public String toString() {
-            return String.format("[T][%s] %s", done() ? "X" : "", desc());
-        }
-
     }
 
     private static class Deadline extends Task {
         private final String deadLine;
         public Deadline(String description, String deadLine) {
-            super(description);
+            super(description, TaskType.DEADLINE);
             this.deadLine = deadLine;
         }
 
         @Override
         public String toString() {
-            return String.format("[D][%s] %s %s", done() ? "X" : "", desc(), this.deadLine);
+            return String.format("[%s][%s] %s %s",
+                    TaskType.DEADLINE.getSymbol(),
+                    done() ? "X" : "",
+                    desc(),
+                    this.deadLine);
         }
     }
     private static class Event extends Task {
         private final String startTime;
         private final String endTime;
         public Event(String description, String startTime, String endTime) {
-            super(description);
+            super(description, TaskType.EVENT);
             this.startTime = startTime;
             this.endTime = endTime;
         }
 
         @Override
         public String toString() {
-            return String.format("[E][%s] %s %s %s", done() ? "X" : "", desc(), this.startTime, this.endTime);
+            return String.format("[%s][%s] %s %s %s",
+                    TaskType.EVENT.getSymbol(),
+                    done() ? "X" : "",
+                    desc(),
+                    this.startTime,
+                    this.endTime);
         }
     }
 
     private static class UberExceptions extends Exception {
         public UberExceptions(String message) {
             super(message);
+        }
+    }
+    private enum TaskType {
+        TODO("T"),
+        DEADLINE("D"),
+        EVENT("E");
+
+        private final String symbol;
+
+        TaskType(String symbol) {
+            this.symbol = symbol;
+        }
+
+        public String getSymbol() {
+            return symbol;
+        }
+
+    }
+    private enum CommandType {
+        BYE("bye"),
+        LIST("list"),
+        MARK("mark"),
+        UNMARK("unmark"),
+        TODO("todo"),
+        DEADLINE("deadline"),
+        EVENT("event"),
+        DELETE("delete"),
+        UNKNOWN("");   // fallback
+
+        private final String keyword;
+
+        CommandType(String keyword) {
+            this.keyword = keyword;
+        }
+
+        public String getKeyword() {
+            return keyword;
+        }
+
+        public static CommandType fromInput(String input) {
+            for (CommandType c : values()) {
+                if (input.startsWith(c.keyword)) {
+                    return c;
+                }
+            }
+            return UNKNOWN;
         }
     }
 }
