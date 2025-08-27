@@ -15,7 +15,7 @@ public class UberSuper {
     private static ArrayList<Task> inputList = new ArrayList<Task>(100);
 
     public static void main(String[] args) {
-        LoadedResult result = dataStorage.load();
+        LoadedResult result = DataStorage.load();
         inputList = result.task;
         greet(result);
         echo();
@@ -56,7 +56,7 @@ public class UberSuper {
     private static void add(Task task) {
         inputList.add(task);
         //save after adding to list
-        dataStorage.save(inputList);
+        DataStorage.save(inputList);
         String message = String.format("You now have %d tasks in the list \n", inputList.size());
         printLine();
         System.out.print("Got it! I've added this task:\n" + task + "\n" + message);
@@ -74,7 +74,7 @@ public class UberSuper {
             Task t = inputList.get(i - 1);
             t.mark();
             // save after changing done status
-            dataStorage.save(inputList);
+            DataStorage.save(inputList);
             printLine();
             System.out.print("Nice! I've marked this task as done: \n");
             System.out.print(t + "\n");
@@ -95,7 +95,7 @@ public class UberSuper {
             }
             Task t = inputList.get(i - 1);
             t.unmark();
-            dataStorage.save(inputList);
+            DataStorage.save(inputList);
             printLine();
             System.out.print("Ok, I've marked this task as not done yet: \n");
             System.out.print(t + "\n");
@@ -200,6 +200,7 @@ public class UberSuper {
             }
             Task t = inputList.get(i - 1);
             inputList.remove(i - 1);
+            DataStorage.save(inputList);
             String message = String.format("You now have %d tasks in the list \n", inputList.size());
             printLine();
             System.out.print("Ok, I've removed this task from the list: \n");
@@ -432,7 +433,7 @@ public class UberSuper {
 
     // handles saving and loading logic
     // Format: [TaskType] | [Status] | Description | Date/Time
-    private static class dataStorage {
+    private static class DataStorage {
         private static final Path DATA_PATH = Paths.get("data", "uberSuper.txt");
 
         static LoadedResult load() {
