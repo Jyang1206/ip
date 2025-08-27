@@ -15,20 +15,37 @@ public class UberSuper {
     private static ArrayList<Task> inputList = new ArrayList<Task>(100);
 
     public static void main(String[] args) {
-        greet();
+        LoadedResult result = dataStorage.load();
+        inputList = result.task;
+        greet(result);
         echo();
+
+        sc.close();
     }
 
     private static void printLine() {
         System.out.print(line + "\n");
     }
 
-    private static void greet() {
+    private static void greet(LoadedResult result) {
+        // show result if available, if not, do standard greeting
         printLine();
         System.out.print(" Hello! I'm " + botName + "\n");
         System.out.print(" What can I do for you?" + "\n");
+        if (result.taskSize > 0 || result.skipped > 0) {
+            printLine();
+            System.out.print(String.format(" (Loaded %d tasks from disk%s)\n",
+                    result.taskSize,
+                    result.skipped > 0
+                            ? String.format(", skipped %d corrupted lines",
+                            result.skipped)
+                            : ""));
+            list();
+            } else {
+            printLine();
+            System.out.print(" There are currently no tasks in your list \n");
+        }
         printLine();
-
     }
 
     private static void goodBye() {
