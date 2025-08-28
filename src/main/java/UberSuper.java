@@ -246,6 +246,48 @@ public class UberSuper {
             printLine();
         }
     }
+    private static void ondate(String input) {
+        try {
+            String[] parts = input.split("\\s+", 2);
+            if (parts.length < 2) throw new UberExceptions("Use: ondate <yyyy-mm-dd | dd/MM/yyyy>");
+            LocalDate day;
+            String raw = parts[1].trim();
+            try {
+                day = LocalDate.parse(raw);
+            } catch (DateTimeParseException ex) {
+                try {
+                    DateTimeFormatter f = DateTimeFormatter.ofPattern("d/M/uuuu");
+                    day = LocalDate.parse(raw, f);
+                } catch (DateTimeParseException e) {
+                    throw new UberExceptions("Use: ondate <yyyy-mm-dd | dd/MM/yyyy>");
+                }
+            }
+
+            printLine();
+            System.out.println("Items on " + day.format(DISPLAY_DATE) + ":");
+            int i = 1;
+            for (Task t : inputList) {
+                if (t instanceof Deadline) {
+                    LocalDate d = ((Deadline) t).deadLine.toLocalDate();
+                    if (d.equals(day)) System.out.println(i++ + ". " + t);
+                } else if (t instanceof Event) {
+                    Event ev = (Event) t;
+                    // consider an event "occurring on" if any part of it touches that date
+                    LocalDate s = ev.startTime.toLocalDate();
+                    LocalDate e = ev.endTime.toLocalDate();
+                    if (!day.isBefore(s) && !day.isAfter(e)) {
+                        System.out.println(i++ + ". " + t);
+                    }
+                }
+            }
+            if (i == 1) System.out.println("(No items.)");
+            printLine();
+        } catch (UberExceptions e) {
+            printLine();
+            System.out.print(e.getMessage() + "\n");
+            printLine();
+        }
+    }
 
     private static void list() {
         printLine();
@@ -318,6 +360,10 @@ public class UberSuper {
 
                     case DELETE:
                         delete(input);
+                        break;
+
+                    case ONDATE:
+                        ondate(input);
                         break;
 
                     case UNKNOWN:
@@ -476,6 +522,7 @@ public class UberSuper {
         DEADLINE("deadline"),
         EVENT("event"),
         DELETE("delete"),
+        ONDATE("ondate"),
         UNKNOWN("");
 
         private final String keyword;
