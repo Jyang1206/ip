@@ -2,17 +2,29 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.*;
 import java.nio.file.StandardOpenOption;
+import java.util.Date;
 import java.util.Scanner;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
-
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
+import java.time.temporal.ChronoUnit;
 
 public class UberSuper {
     private static final String botName = "UberSuper";
     private static final String line = "_________________________________";
     private static final Scanner sc = new Scanner(System.in);
     private static ArrayList<Task> inputList = new ArrayList<Task>(100);
+
+    // ===== Dates & Times =====
+    private static final DateTimeFormatter DISPLAY_DATE = DateTimeFormatter.ofPattern("MMM dd yyyy");
+    private static final DateTimeFormatter DISPLAY_DATETIME = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+    private static final DateTimeFormatter STORAGE_DATE = DateTimeFormatter.ISO_LOCAL_DATE;
+    private static final DateTimeFormatter STORAGE_DATETIME = DateTimeFormatter.ISO_LOCAL_DATE_TIME;
 
     public static void main(String[] args) {
         LoadedResult result = DataStorage.load();
@@ -41,7 +53,7 @@ public class UberSuper {
                             result.skipped)
                             : ""));
             list();
-            } else {
+        } else {
             printLine();
             System.out.print(" There are currently no tasks in your list \n");
         }
@@ -123,6 +135,58 @@ public class UberSuper {
         }
     }
 
+    // ===== Date/Time parsing helpers =====
+
+    private static LocalDateTime parseWhen(String raw) throws UberExceptions {
+        String s = raw.trim();
+
+        // 1) ISO date-time: 2019-12-02T18:00 (or "2019-12-02 18:00")
+        try {
+            if (s.contains("T")) return LocalDateTime.parse(s);
+            if (s.matches("\\d{4}-\\d{2}-\\d{2}\\s+\\d{2}:\\d{2}")) {
+                return LocalDateTime.parse(s.replace(' ', 'T'));
+            }
+        } catch (DateTimeParseException ignore) {}
+
+        // 2) ISO date only: 2019-12-02  (treat as 00:00)
+        try { return LocalDate.parse(s).atStartOfDay(); } catch (DateTimeParseException ignore) {}
+
+        // 3) dd/MM/yyyy HHmm   e.g. 2/12/2019 1800
+        try {
+            DateTimeFormatter f = DateTimeFormatter.ofPattern("d/M/uuuu HHmm");
+            return LocalDateTime.parse(s, f);
+        } catch (DateTimeParseException ignore) {}
+
+        // 4) dd/MM/yyyy        (00:00)
+        try {
+            DateTimeFormatter f = DateTimeFormatter.ofPattern("d/M/uuuu");
+            return LocalDate.parse(s, f).atStartOfDay();
+        } catch (DateTimeParseException ignore) {}
+
+        // 5) d-M-uuuu HHmm
+        try {
+            DateTimeFormatter f = DateTimeFormatter.ofPattern("d-M-uuuu HHmm");
+            return LocalDateTime.parse(s, f);
+        } catch (DateTimeParseException ignore) {}
+
+        // 6) d-M-uuuu (00:00)
+        try {
+            DateTimeFormatter f = DateTimeFormatter.ofPattern("d-M-uuuu");
+            return LocalDate.parse(s, f).atStartOfDay();
+        } catch (DateTimeParseException ignore) {}
+
+        throw new UberExceptions("I couldn't understand the date/time: \"" + raw + "\".\n"
+                + "Try formats like: 2019-12-02, 2019-12-02 18:00, 2/12/2019 1800.");
+    }
+
+    // Convenient display: if time is 00:00, show date only
+    private static String display(LocalDateTime dt) {
+        if (dt.toLocalTime().equals(LocalTime.MIDNIGHT)) {
+            return dt.toLocalDate().format(DISPLAY_DATE);
+        }
+        return dt.format(DISPLAY_DATETIME);
+    }
+
     private static void deadline(String input) {
         try {
             String[] parts = input.split("/");
@@ -131,14 +195,15 @@ public class UberSuper {
             }
             String desc = parts[0].replaceFirst("deadline", "").trim();
             String[] p1 = parts[1].trim().split("\\s+", 2);
-            if (p1.length < 2 || p1[0].equalsIgnoreCase("by")) {
+            if (p1.length < 2 || !p1[0].equalsIgnoreCase("by")) {
                 throw new UberExceptions("Use format: deadline <desc> / by <time>");
             }
-            String dl = parts[1].replaceFirst("by", "(by:");
+            String p2 = p1[1].trim();
             if (desc.isEmpty()) {
                 throw new UberExceptions("Please provide a description");
             }
-            add(new Deadline(desc, dl + ")"));
+            LocalDateTime dl = parseWhen(p2);
+            add(new Deadline(desc, dl));
         } catch (UberExceptions e) {
             printLine();
             System.out.print(e.getMessage() + "\n");
@@ -155,24 +220,68 @@ public class UberSuper {
             } else if (parts.length < 3) {
                 throw new UberExceptions("So when does it end?");
             }
-            String desc = parts[0].replaceFirst("event", "").trim();
-            String[] p1 = parts[1].trim().split("\\s+", 2);
-            String[] p2 = parts[2].trim().split("\\s+", 2);
 
-            //ensure correct formatting
-            if (p1.length < 2 || !p1[0].equalsIgnoreCase("from")) {
-                throw new UberExceptions("Use format: event <desc> /from <start> /to <end>");
-            }
-            if (p2.length < 2 || !p2[0].equalsIgnoreCase("to")) {
-                throw new UberExceptions("Use format: event <desc> /from <start> /to <end>");
-            }
-            String startTime = parts[1].replaceFirst("from", "(from:");
-            String endTime = parts[2].replaceFirst("to", "to:");
+            String desc = parts[0].replaceFirst("event", "").trim();
+            String fromPart = parts[1].trim(); // "from ..."
+            String toPart   = parts[2].trim(); // "to ..."
 
             if (desc.isEmpty()) {
                 throw new UberExceptions("Please describe the event");
             }
-            add(new Event(desc, startTime, endTime + ")"));
+            //ensure correct formatting
+            if (!fromPart.toLowerCase().startsWith("from") || !toPart.toLowerCase().startsWith("to")) {
+                throw new UberExceptions("Use format: event <desc> /from <start> /to <end>");
+            }
+
+            LocalDateTime startTime = parseWhen(fromPart.substring(4).trim());
+            LocalDateTime endTime = parseWhen(toPart.substring(2).trim());
+
+            if (endTime.isBefore(startTime)) {
+                throw new UberExceptions("End time cannot be before start time.");
+            }
+            add(new Event(desc, startTime, endTime));
+        } catch (UberExceptions e) {
+            printLine();
+            System.out.print(e.getMessage() + "\n");
+            printLine();
+        }
+    }
+    private static void ondate(String input) {
+        try {
+            String[] parts = input.split("\\s+", 2);
+            if (parts.length < 2) throw new UberExceptions("Use: ondate <yyyy-mm-dd | dd/MM/yyyy>");
+            LocalDate day;
+            String raw = parts[1].trim();
+            try {
+                day = LocalDate.parse(raw);
+            } catch (DateTimeParseException ex) {
+                try {
+                    DateTimeFormatter f = DateTimeFormatter.ofPattern("d/M/uuuu");
+                    day = LocalDate.parse(raw, f);
+                } catch (DateTimeParseException e) {
+                    throw new UberExceptions("Use: ondate <yyyy-mm-dd | dd/MM/yyyy>");
+                }
+            }
+
+            printLine();
+            System.out.println("Items on " + day.format(DISPLAY_DATE) + ":");
+            int i = 1;
+            for (Task t : inputList) {
+                if (t instanceof Deadline) {
+                    LocalDate d = ((Deadline) t).deadLine.toLocalDate();
+                    if (d.equals(day)) System.out.println(i++ + ". " + t);
+                } else if (t instanceof Event) {
+                    Event ev = (Event) t;
+                    // consider an event "occurring on" if any part of it touches that date
+                    LocalDate s = ev.startTime.toLocalDate();
+                    LocalDate e = ev.endTime.toLocalDate();
+                    if (!day.isBefore(s) && !day.isAfter(e)) {
+                        System.out.println(i++ + ". " + t);
+                    }
+                }
+            }
+            if (i == 1) System.out.println("(No items.)");
+            printLine();
         } catch (UberExceptions e) {
             printLine();
             System.out.print(e.getMessage() + "\n");
@@ -253,6 +362,10 @@ public class UberSuper {
                         delete(input);
                         break;
 
+                    case ONDATE:
+                        ondate(input);
+                        break;
+
                     case UNKNOWN:
                     default:
                         throw new UberExceptions("Sorry! I have no idea what you're trying to do.");
@@ -321,9 +434,9 @@ public class UberSuper {
     }
 
     private static class Deadline extends Task {
-        private final String deadLine;
+        private final LocalDateTime deadLine;
 
-        public Deadline(String description, String deadLine) {
+        public Deadline(String description, LocalDateTime deadLine) {
             super(description, TaskType.DEADLINE);
             this.deadLine = deadLine;
         }
@@ -334,7 +447,7 @@ public class UberSuper {
                     TaskType.DEADLINE.getSymbol(),
                     done() ? "X" : "",
                     desc(),
-                    this.deadLine);
+                    "(by: " + display(this.deadLine) + ")");
         }
         @Override
         public String formattedString() {
@@ -342,15 +455,15 @@ public class UberSuper {
                     type().getSymbol(),
                     done() ? 1 : 0,
                     desc(),
-                    deadLine);
+                    this.deadLine.format(STORAGE_DATETIME));
         }
     }
 
     private static class Event extends Task {
-        private final String startTime;
-        private final String endTime;
+        private final LocalDateTime startTime;
+        private final LocalDateTime endTime;
 
-        public Event(String description, String startTime, String endTime) {
+        public Event(String description, LocalDateTime startTime, LocalDateTime endTime) {
             super(description, TaskType.EVENT);
             this.startTime = startTime;
             this.endTime = endTime;
@@ -362,8 +475,8 @@ public class UberSuper {
                     TaskType.EVENT.getSymbol(),
                     done() ? "X" : "",
                     desc(),
-                    this.startTime,
-                    this.endTime);
+                    "(from: " + display(this.startTime) + ")",
+                    "(to: " + display(this.endTime)) + ")";
         }
         @Override
         public String formattedString() {
@@ -371,8 +484,8 @@ public class UberSuper {
                     type().getSymbol(),
                     done() ? 1 : 0,
                     desc(),
-                    this.startTime,
-                    this.endTime);
+                    this.startTime.format((STORAGE_DATETIME)),
+                    this.endTime.format((STORAGE_DATETIME)));
         }
     }
 
@@ -409,7 +522,8 @@ public class UberSuper {
         DEADLINE("deadline"),
         EVENT("event"),
         DELETE("delete"),
-        UNKNOWN("");   // fallback
+        ONDATE("ondate"),
+        UNKNOWN("");
 
         private final String keyword;
 
@@ -466,37 +580,44 @@ public class UberSuper {
                         int done = Integer.parseInt(parts[1]);
                         String description = parts[2];
                         switch (type) {
-                            case "T":
+                            case "T": {
                                 Todo t = new Todo(description);
                                 if (done == 1) {
                                     t.mark();
                                 }
                                 tasks.add(t);
                                 break;
-                            case "D":
+                            }
+                            case "D":{
                                 // incomplete prompt
                                 if (parts.length < 4) {
                                     skipped++;
                                     break;
                                 }
-                                Deadline d = new Deadline(description, parts[3]);
-                                if (done == 1) {
-                                    d.mark();
-                                }
-                                tasks.add(d);
-                                break;
-                            case "E":
-                                // incomplete prompt
-                                if (parts.length < 5) {
+                                try {
+                                    LocalDateTime deadline = LocalDateTime.parse(parts[3]);
+                                    Deadline d = new Deadline(description, deadline);
+                                    if (done == 1) {
+                                        d.mark();
+                                    }
+                                    tasks.add(d);
+                                } catch (DateTimeParseException e) {
                                     skipped++;
-                                    break;
                                 }
-                                Event e = new Event(description, parts[3], parts[4]);
-                                if (done == 1) {
-                                    e.mark();
-                                }
-                                tasks.add(e);
                                 break;
+                            }
+
+                            case "E": {
+                                if (parts.length < 5) { skipped++; break; }
+                                try {
+                                    LocalDateTime start = LocalDateTime.parse(parts[3]);
+                                    LocalDateTime end   = LocalDateTime.parse(parts[4]);
+                                    Event e = new Event(description, start, end);
+                                    if (done == 1) e.mark();
+                                    tasks.add(e);
+                                } catch (DateTimeParseException ex) { skipped++; }
+                                break;
+                            }
 
                             default:
                                 // task not labelled correctly
