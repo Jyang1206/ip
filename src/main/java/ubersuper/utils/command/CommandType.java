@@ -1,4 +1,4 @@
-package Utils;
+package ubersuper.utils.command;
 
 public enum CommandType {
     BYE("bye"),

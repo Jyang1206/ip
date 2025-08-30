@@ -1,4 +1,4 @@
-package Tasks;
+package ubersuper.tasks;
 
 public enum TaskType {
     TODO("T"),

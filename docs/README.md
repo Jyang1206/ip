@@ -1,4 +1,4 @@
-# UberSuper User Guide
+# ubersuper.UberSuper User Guide
 
 // Update the title above to match the actual product name
 
