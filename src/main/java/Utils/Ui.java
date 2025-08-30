@@ -4,9 +4,13 @@ import Exceptions.UberExceptions;
 import Tasks.Task;
 import Tasks.TaskList;
 
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Scanner;
 
 public class Ui {
+
     private static final String botName = "UberSuper";
     private final Scanner sc;
     private static final String line = "_________________________________";
@@ -56,7 +60,7 @@ public class Ui {
                         break;
 
                     case ONDATE:
-                        tasks.ondate(input);
+                        tasks.onDate(input);
                         break;
 
                     case UNKNOWN:
@@ -92,12 +96,14 @@ public class Ui {
                             ? String.format(", skipped %d corrupted lines",
                             result.skipped())
                             : ""));
-            result.task().list();
+            result.tasks().list();
         } else {
             printLine();
             System.out.print(" There are currently no tasks in your list \n");
         }
         printLine();
     }
+
+
 
 }

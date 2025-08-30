@@ -9,9 +9,11 @@ public enum CommandType {
     DEADLINE("deadline"),
     EVENT("event"),
     DELETE("delete"),
-    ONDATE("ondate"),
+    ONDATE("onDate"),
     UNKNOWN("");
+
     private final String keyword;
+
     CommandType(String keyword) {
         this.keyword = keyword;
     }

@@ -11,27 +11,22 @@ import java.nio.file.StandardOpenOption;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
-import java.util.*;
+import java.util.Collection;
+import java.util.List;
+import java.util.stream.Collectors;
 
-
+// handles saving and loading logic
+// Format: [TaskType] | [Status] | Description | Date/Time
 public class DataStorage {
-    // ===== Dates & Times =====
-    private final DateTimeFormatter DISPLAY_DATE = DateTimeFormatter.ofPattern("MMM dd yyyy");
-    private final DateTimeFormatter DISPLAY_DATETIME = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
-    private final DateTimeFormatter STORAGE_DATE = DateTimeFormatter.ISO_LOCAL_DATE;
-    private final DateTimeFormatter STORAGE_DATETIME = DateTimeFormatter.ISO_LOCAL_DATE_TIME;
 
-    // handles saving and loading logic
-    // Format: [TaskType] | [Status] | Description | Date/Time
         private final Path DATA_PATH;
 
         public DataStorage(String fileName) {
             DATA_PATH = Paths.get("data", fileName);
-
         }
 
         public LoadedResult load() {
-            ArrayList<Task> tasks = new ArrayList<>();
+            TaskList tasks = new TaskList(this);
             int skipped = 0;
             try {
                 if (Files.notExists(DATA_PATH.getParent())) {
@@ -113,7 +108,7 @@ public class DataStorage {
             }
         }
 
-        public static void save(ArrayList<Task> tasks) {
+        public void save(TaskList tasks) {
             try {
                 if (Files.notExists(DATA_PATH.getParent())) {
                     Files.createDirectories(DATA_PATH.getParent());
@@ -127,5 +122,3 @@ public class DataStorage {
             }
         }
     }
-
-}

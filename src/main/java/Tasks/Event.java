@@ -1,5 +1,6 @@
 package Tasks;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 public class Event extends Task {
@@ -12,6 +13,16 @@ public class Event extends Task {
         this.endTime = endTime;
     }
 
+    public boolean onDate(LocalDate day, int i) {
+        LocalDate s = this.startTime.toLocalDate();
+        LocalDate e = this.endTime.toLocalDate();
+        if (!day.isBefore(s) && !day.isAfter(e)) {
+            System.out.println(i++ + ". " + this);
+            return true;
+        }
+        return false;
+    }
+
     @Override
     public String toString() {
         return String.format("[%s][%s] %s %s %s",
@@ -21,6 +32,7 @@ public class Event extends Task {
                 "(from: " + display(this.startTime) + ")",
                 "(to: " + display(this.endTime)) + ")";
     }
+
     @Override
     public String formattedString() {
         return String.format("%s | %d | %s | %s | %s",
@@ -30,3 +42,4 @@ public class Event extends Task {
                 this.startTime.format((STORAGE_DATETIME)),
                 this.endTime.format((STORAGE_DATETIME)));
     }
+}

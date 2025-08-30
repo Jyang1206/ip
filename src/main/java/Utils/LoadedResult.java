@@ -5,12 +5,12 @@ import Tasks.*;
 import java.util.ArrayList;
 
 public class LoadedResult {
-    private final TaskList task;
+    private final TaskList tasks;
     private final int taskSize;
     private final int skipped;
 
-    public LoadedResult(TaskList task, int taskSize, int skipped) {
-        this.task = task;
+    public LoadedResult(TaskList tasks, int taskSize, int skipped) {
+        this.tasks = tasks;
         this.taskSize = taskSize;
         this.skipped = skipped;
     }
@@ -23,8 +23,8 @@ public class LoadedResult {
         return this.skipped;
     }
 
-    public TaskList task() {
-        return this.task;
+    public TaskList tasks() {
+        return this.tasks;
     }
 
 }

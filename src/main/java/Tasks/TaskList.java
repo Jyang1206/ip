@@ -7,31 +7,29 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
+import Utils.Parser;
 
-public class TaskList {
-    public ArrayList<Task> taskList = new ArrayList<Task>(100);
+import javax.xml.crypto.Data;
 
-    public void add(Task task) {
-        taskList.add(task);
-        //save after adding to list
-        DataStorage.save(taskList);
-        String message = String.format("You now have %d tasks in the list \n", taskList.size());
-        Ui.printLine();
-        System.out.print("Got it! I've added this task:\n" + task + "\n" + message);
-        Ui.printLine();
+public class TaskList extends ArrayList<Task> {
+    private final DataStorage dataStorage;
+
+    public TaskList(DataStorage dataStorage) {
+        this.dataStorage = dataStorage;
     }
+
     public void mark(String input) {
         String[] parts = input.split("\\s+", 2);
         int i = Integer.parseInt(parts[1]);
 
         try {
-            if (i < 1 || i > taskList.size()) {
+            if (i < 1 || i > this.size()) {
                 throw new UberExceptions("There's no such task in the list");
             }
-            Task t = taskList.get(i - 1);
+            Task t = this.get(i - 1);
             t.mark();
             // save after changing done status
-            DataStorage.save(taskList);
+            dataStorage.save(this);
             Ui.printLine();
             System.out.print("Nice! I've marked this task as done: \n");
             System.out.print(t + "\n");
@@ -47,12 +45,12 @@ public class TaskList {
         String[] parts = input.split("\\s+", 2);
         int i = Integer.parseInt(parts[1]);
         try {
-            if (i < 1 || i > taskList.size()) {
+            if (i < 1 || i > this.size()) {
                 throw new UberExceptions("There's no such task in the list");
             }
-            Task t = taskList.get(i - 1);
+            Task t = this.get(i - 1);
             t.unmark();
-            DataStorage.save(taskList);
+            dataStorage.save(this);
             Ui.printLine();
             System.out.print("Ok, I've marked this task as not done yet: \n");
             System.out.print(t + "\n");
@@ -66,18 +64,27 @@ public class TaskList {
     }
 
     public void todo(String input) {
-
         try {
             String[] parts = input.split("\\s+", 2);
             if (parts.length < 2 || parts[1].trim().isEmpty()) {
                 throw new UberExceptions("You forgot to include what you're supposed to do");
             }
-            add(new Todo(parts[1].trim()));
+            Todo t = new Todo(parts[1].trim());
+            this.add(t);
+            this.save(t);
         } catch (UberExceptions e) {
             Ui.printLine();
             System.out.print(e.getMessage() + "\n");
             Ui.printLine();
         }
+    }
+
+    public void save(Task t) {
+        dataStorage.save(this);
+        String message = String.format("You now have %d tasks in the list \n", this.size());
+        Ui.printLine();
+        System.out.print("Got it! I've added this task:\n" + t + "\n" + message);
+        Ui.printLine();
     }
 
     public void deadline(String input) {
@@ -95,8 +102,10 @@ public class TaskList {
             if (desc.isEmpty()) {
                 throw new UberExceptions("Please provide a description");
             }
-            LocalDateTime dl = parseWhen(p2);
-            add(new Deadline(desc, dl));
+            LocalDateTime dl = Parser.parseWhen(p2);
+            Deadline d = new Deadline(desc, dl);
+            add(d);
+            save(d);
         } catch (UberExceptions e) {
             Ui.printLine();
             System.out.print(e.getMessage() + "\n");
@@ -126,23 +135,25 @@ public class TaskList {
                 throw new UberExceptions("Use format: event <desc> /from <start> /to <end>");
             }
 
-            LocalDateTime startTime = parseWhen(fromPart.substring(4).trim());
-            LocalDateTime endTime = parseWhen(toPart.substring(2).trim());
+            LocalDateTime startTime = Parser.parseWhen(fromPart.substring(4).trim());
+            LocalDateTime endTime = Parser.parseWhen(toPart.substring(2).trim());
 
             if (endTime.isBefore(startTime)) {
                 throw new UberExceptions("End time cannot be before start time.");
             }
-            add(new Event(desc, startTime, endTime));
+            Event ev = new Event(desc, startTime, endTime);
+            add(ev);
+            save(ev);
         } catch (UberExceptions e) {
             Ui.printLine();
             System.out.print(e.getMessage() + "\n");
             Ui.printLine();
         }
     }
-    public void ondate(String input) {
+    public void onDate(String input) {
         try {
             String[] parts = input.split("\\s+", 2);
-            if (parts.length < 2) throw new UberExceptions("Use: ondate <yyyy-mm-dd | dd/MM/yyyy>");
+            if (parts.length < 2) throw new UberExceptions("Use: onDate <yyyy-mm-dd | dd/MM/yyyy>");
             LocalDate day;
             String raw = parts[1].trim();
             try {
@@ -152,25 +163,26 @@ public class TaskList {
                     DateTimeFormatter f = DateTimeFormatter.ofPattern("d/M/uuuu");
                     day = LocalDate.parse(raw, f);
                 } catch (DateTimeParseException e) {
-                    throw new UberExceptions("Use: ondate <yyyy-mm-dd | dd/MM/yyyy>");
+                    throw new UberExceptions("Use: onDate <yyyy-mm-dd | dd/MM/yyyy>");
                 }
             }
 
             Ui.printLine();
-            System.out.println("Items on " + day.format(DISPLAY_DATE) + ":");
+            System.out.println("Items on " + day.format(DateTimeFormatter.ofPattern("MMM dd yyyy")) + ":");
             int i = 1;
-            for (Task t : taskList) {
+            for (Task t : this) {
                 if (t instanceof Deadline) {
-                    LocalDate d = ((Deadline) t).deadLine.toLocalDate();
-                    if (d.equals(day)) System.out.println(i++ + ". " + t);
+                    Deadline d = (Deadline) t;
+                    if (d.onDate(day, i)) {
+                        i++;
+                    };
                 } else if (t instanceof Event) {
                     Event ev = (Event) t;
                     // consider an event "occurring on" if any part of it touches that date
-                    LocalDate s = ev.startTime.toLocalDate();
-                    LocalDate e = ev.endTime.toLocalDate();
-                    if (!day.isBefore(s) && !day.isAfter(e)) {
-                        System.out.println(i++ + ". " + t);
-                    }
+                    if (ev.onDate(day, i)) {
+                        i++;
+                    };
+
                 }
             }
             if (i == 1) System.out.println("(No items.)");
@@ -186,7 +198,7 @@ public class TaskList {
         Ui.printLine();
         int listNum = 1;
         System.out.print("Here are the tasks in your list:\n");
-        for (Task task : taskList) {
+        for (Task task : this) {
             System.out.print(listNum + ". " + task + "\n");
             listNum++;
         }
@@ -197,13 +209,13 @@ public class TaskList {
         String[] parts = input.split("\\s+", 2);
         int i = Integer.parseInt(parts[1]);
         try {
-            if (i > taskList.size()) {
+            if (i > this.size()) {
                 throw new UberExceptions("You're deleting something that doesn't exist");
             }
-            Task t = taskList.get(i - 1);
-            taskList.remove(i - 1);
-            DataStorage.save(taskList);
-            String message = String.format("You now have %d tasks in the list \n", taskList.size());
+            Task t = this.get(i - 1);
+            this.remove(i - 1);
+            dataStorage.save(this);
+            String message = String.format("You now have %d tasks in the list \n", this.size());
             Ui.printLine();
             System.out.print("Ok, I've removed this task from the list: \n");
             System.out.print(t + "\n");
@@ -214,6 +226,5 @@ public class TaskList {
             System.out.print(e.getMessage() + "\n");
             Ui.printLine();
         }
-
     }
 }

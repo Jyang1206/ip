@@ -1,5 +1,6 @@
 package Tasks;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 public class Deadline extends Task {
@@ -8,6 +9,16 @@ public class Deadline extends Task {
     public Deadline(String description, LocalDateTime deadLine) {
         super(description, TaskType.DEADLINE);
         this.deadLine = deadLine;
+    }
+
+    @Override
+    public boolean onDate(LocalDate day, int i) {
+        LocalDate d = this.deadLine.toLocalDate();
+        if (d.equals(day)) {
+            System.out.println(i++ + ". " + this);
+            return true;
+        }
+        return false;
     }
 
     @Override

@@ -7,10 +7,11 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
+import Utils.DataStorage;
 
 public class Parser {
     // ===== Date/Time parsing helpers =====
-    public LocalDateTime parseWhen(String raw) throws UberExceptions {
+    public static LocalDateTime parseWhen(String raw) throws UberExceptions {
         String s = raw.trim();
 
         // 1) ISO date-time: 2019-12-02T18:00 (or "2019-12-02 18:00")
@@ -52,12 +53,5 @@ public class Parser {
                 + "Try formats like: 2019-12-02, 2019-12-02 18:00, 2/12/2019 1800.");
     }
 
-    // Convenient display: if time is 00:00, show date only
-    private static String display(LocalDateTime dt) {
-        if (dt.toLocalTime().equals(LocalTime.MIDNIGHT)) {
-            return dt.toLocalDate().format(DISPLAY_DATE);
-        }
-        return dt.format(DISPLAY_DATETIME);
-    }
 
 }

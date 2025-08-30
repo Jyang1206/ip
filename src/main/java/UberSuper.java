@@ -5,17 +5,17 @@ import Tasks.*;
 
 public class UberSuper {
     private final Scanner sc = new Scanner(System.in);
-    private TaskList taskList = new TaskList();
-    private final Ui ui = new Ui(sc, taskList);
     private final DataStorage storage = new DataStorage("uberSuper.txt");
+    private final LoadedResult result = storage.load();
+    private TaskList taskList = result.tasks();
+    private final Ui ui = new Ui(sc, taskList);
 
 
     public UberSuper() {
     }
 
     public void run() {
-        LoadedResult result = storage.load();
-        taskList = result.task();
+
         ui.greet(result);
         ui.echo();
 
