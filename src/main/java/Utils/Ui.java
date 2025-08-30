@@ -1,14 +1,17 @@
-package ubersuper.utils;
+package Utils;
 
-import ubersuper.exceptions.UberExceptions;
-import ubersuper.tasks.TaskList;
-import ubersuper.utils.commands.CommandType;
+import Exceptions.UberExceptions;
+import Tasks.Task;
+import Tasks.TaskList;
 
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Scanner;
 
 public class Ui {
 
-    private static final String botName = "ubersuper.UberSuper";
+    private static final String botName = "UberSuper";
     private final Scanner sc;
     private static final String line = "_________________________________";
     private final TaskList tasks;

@@ -1,4 +1,4 @@
-package ubersuper.exceptions;
+package Exceptions;
 
 public class UberExceptions extends RuntimeException {
   //exceptions from chatBot

@@ -1,4 +1,4 @@
-package ubersuper.tasks;
+package Tasks;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;

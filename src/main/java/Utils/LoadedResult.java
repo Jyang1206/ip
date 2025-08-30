@@ -1,7 +1,8 @@
-package ubersuper.utils;
+package Utils;
 
+import Tasks.*;
 
-import ubersuper.tasks.TaskList;
+import java.util.ArrayList;
 
 public class LoadedResult {
     private final TaskList tasks;
