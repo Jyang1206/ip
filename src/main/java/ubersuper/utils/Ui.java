@@ -60,6 +60,9 @@ public class Ui {
                         tasks.onDate(input);
                         break;
 
+                    case FIND:
+                        break;
+
                     case UNKNOWN:
                     default:
                         throw new UberExceptions("Sorry! I have no idea what you're trying to do.");
