@@ -61,6 +61,7 @@ public class Ui {
                         break;
 
                     case FIND:
+                        tasks.find(input);
                         break;
 
                     case UNKNOWN:
