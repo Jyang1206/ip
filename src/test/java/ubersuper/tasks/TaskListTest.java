@@ -40,7 +40,7 @@ public class TaskListTest {
     }
 
     @Test
-    void listTest() {
+    void list_withTasks_printsHeaderAndNumberedItems() {
         tasks.add(new Todo("T1 do something"));
         tasks.add(new Deadline("D1 report", LocalDateTime.of(2019, 10, 15, 0, 0)));
         tasks.add(new Event("E1 meet", LocalDateTime.of(2019, 12, 2, 9, 0),
@@ -60,7 +60,7 @@ public class TaskListTest {
     }
 
     @Test
-    void onDateFilterTest() {
+    void onDate_withDeadlinesAndEvents_filtersItemsTouchingDay() {
         // Deadlines
         tasks.add(new Deadline("D1", LocalDateTime.of(2019, 12, 2, 0, 0)));  // ✓
         tasks.add(new Deadline("D2", LocalDateTime.of(2019, 12, 3, 0, 0)));  // ✗
@@ -104,7 +104,7 @@ public class TaskListTest {
     }
 
     @Test
-    void onDateLocalDateTimeTest() {
+    void onDate_withIsoSlashDashAndDateTime_acceptsInput() {
         String iso = runOnDate("2019-12-02");
         assertTrue(iso.contains("Items on Dec 02 2019:"), iso);
 
@@ -123,7 +123,7 @@ public class TaskListTest {
     }
 
     @Test
-    void rejects_two_digit_year_with_usage_hint() {
+    void onDate_withTwoDigitYear_showsUsageHint() {
         String bad = runOnDate("10-10-20");
         assertTrue(bad.contains("Use: onDate <yyyy-mm-dd | dd/MM/yyyy>"), bad);
     }

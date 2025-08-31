@@ -11,13 +11,36 @@ import ubersuper.utils.DataStorage;
 import ubersuper.utils.Parser;
 import ubersuper.utils.Ui;
 
+/**
+ * Mutable list of {@link Task} items plus high-level operations used by the UI.
+ * <p>
+ * Responsibilities:
+ * <ul>
+ *   <li>Holds tasks in memory (extends {@code ArrayList<Task>}).</li>
+ *   <li>Implements command behaviors: {@code list}, {@code todo}, {@code deadline},
+ *       {@code event}, {@code delete}, {@code mark}, {@code unmark}, {@code onDate}.</li>
+ *   <li>Stores changes to {@link DataStorage} after any state change.</li>
+ *   <li>Prints user-facing messages (divider lines are handled by {@link Ui}).</li>
+ * </ul>
+ */
 public class TaskList extends ArrayList<Task> {
     private final DataStorage dataStorage;
 
+    /**
+     * Creates a {@code TaskList} bound to a storage backend.
+     *
+     * @param dataStorage storage component used to save/load the task list (may be {@code null} in tests)
+     */
     public TaskList(DataStorage dataStorage) {
         this.dataStorage = dataStorage;
     }
 
+    /**
+     * Marks the i-th task as done (1-based index), saves the list, and prints a confirmation.
+     *
+     * @param input full user input line, e.g., {@code "mark 3"}
+     * @throws UberExceptions if the index is missing or out of range
+     */
     public void mark(String input) {
         String[] parts = input.split("\\s+", 2);
         int i = Integer.parseInt(parts[1]);
@@ -40,7 +63,12 @@ public class TaskList extends ArrayList<Task> {
             Ui.printLine();
         }
     }
-
+    /**
+     * Marks the i-th task as not done (1-based index), saves the list, and prints a confirmation.
+     *
+     * @param input full user input line, e.g., {@code "unmark 2"}
+     * @throws UberExceptions if the index is missing or out of range
+     */
     public void unmark(String input) {
         String[] parts = input.split("\\s+", 2);
         int i = Integer.parseInt(parts[1]);
@@ -63,6 +91,13 @@ public class TaskList extends ArrayList<Task> {
 
     }
 
+    /**
+     * Adds a {@link Todo} from the given input, saves the list, and prints a confirmation.
+     * <p>Expected format: {@code "todo <description>"}.</p>
+     *
+     * @param input full user input line
+     * @throws UberExceptions if the description is missing/blank
+     */
     public void todo(String input) {
         try {
             String[] parts = input.split("\\s+", 2);
@@ -78,7 +113,11 @@ public class TaskList extends ArrayList<Task> {
             Ui.printLine();
         }
     }
-
+    /**
+     * Stores the current list and prints the "added" confirmation for the provided task.
+     *
+     * @param t the task that was just added
+     */
     public void save(Task t) {
         dataStorage.save(this);
         String message = String.format("You now have %d tasks in the list \n", this.size());
@@ -87,6 +126,18 @@ public class TaskList extends ArrayList<Task> {
         Ui.printLine();
     }
 
+    /**
+     * Adds a {@link Deadline} parsed from user input, saves the list, and prints a confirmation.
+     * <p>Expected format: {@code "deadline <desc> /by <when>"}.</p>
+     * <p>
+     * Supported {@code <when>} formats are delegated to {@link Parser#parseWhen(String)} and include:
+     * {@code yyyy-MM-dd}, {@code yyyy-MM-dd HH:mm}, {@code yyyy-MM-dd'T'HH:mm}, {@code d/M/uuuu [HHmm]},
+     * {@code d-M-uuuu [HHmm]}.
+     * </p>
+     *
+     * @param input full user input line
+     * @throws UberExceptions if the format is wrong or date-time cannot be parsed
+     */
     public void deadline(String input) {
         try {
             String[] parts = input.split("/");
@@ -114,6 +165,17 @@ public class TaskList extends ArrayList<Task> {
 
     }
 
+    /**
+     * Adds an {@link Event} parsed from user input, saves the list, and prints a confirmation.
+     * <p>Expected format: {@code "event <desc> /from <start> /to <end>"}.</p>
+     * <p>
+     * Date-time parsing is delegated to {@link Parser#parseWhen(String)} and supports the same formats
+     * as {@link #deadline(String)}. The end time must not be before the start time.
+     * </p>
+     *
+     * @param input full user input line
+     * @throws UberExceptions if the format is wrong, dates cannot be parsed, or end &lt; start
+     */
     public void event(String input) {
         try {
             String[] parts = input.split("/");
@@ -150,6 +212,23 @@ public class TaskList extends ArrayList<Task> {
             Ui.printLine();
         }
     }
+
+    /**
+     * Lists deadlines/events that occur on a specific date (Todos are ignored).
+     * <p>Expected formats: {@code onDate yyyy-MM-dd} or {@code onDate d/M/uuuu}.</p>
+     * <p>
+     * Behavior:
+     * <ul>
+     *   <li>Deadlines match if their date equals the given day.</li>
+     *   <li>Events match if the day overlaps the inclusive range
+     *       {@code [start.toLocalDate(), end.toLocalDate()] }.</li>
+     *   <li>Prints a header, then matching items numbered from 1; prints "(No items.)" if none.</li>
+     * </ul>
+     * </p>
+     *
+     * @param input full user input line, e.g., {@code "onDate 2019-12-02"}
+     * @throws UberExceptions if the date cannot be parsed
+     */
     public void onDate(String input) {
         try {
             String[] parts = input.split("\\s+", 2);
@@ -192,6 +271,9 @@ public class TaskList extends ArrayList<Task> {
         }
     }
 
+    /**
+     * Prints all tasks with their 1-based indices.
+     */
     public void list() {
         Ui.printLine();
         int listNum = 1;
@@ -203,6 +285,12 @@ public class TaskList extends ArrayList<Task> {
         Ui.printLine();
     }
 
+    /**
+     * Deletes the i-th task (1-based index), saves the list, and prints a confirmation.
+     *
+     * @param input full user input line, e.g., {@code "delete 1"}
+     * @throws UberExceptions if the index is missing or out of range
+     */
     public void delete(String input) {
         String[] parts = input.split("\\s+", 2);
         int i = Integer.parseInt(parts[1]);
