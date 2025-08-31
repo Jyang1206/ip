@@ -24,45 +24,45 @@ public class Ui {
             CommandType command = CommandType.fromInput(input);
             try {
                 switch (command) {
-                    case BYE:
-                        goodBye();
-                        return;
+                case BYE:
+                    goodBye();
+                    return;
 
-                    case LIST:
-                        tasks.list();
-                        break;
+                case LIST:
+                    tasks.list();
+                    break;
 
-                    case MARK:
-                        tasks.mark(input);
-                        break;
+                case MARK:
+                    tasks.mark(input);
+                    break;
 
-                    case UNMARK:
-                        tasks.unmark(input);
-                        break;
+                case UNMARK:
+                    tasks.unmark(input);
+                    break;
 
-                    case TODO:
-                        tasks.todo(input);
-                        break;
+                case TODO:
+                    tasks.todo(input);
+                    break;
 
-                    case DEADLINE:
-                        tasks.deadline(input);
-                        break;
+                case DEADLINE:
+                    tasks.deadline(input);
+                    break;
 
-                    case EVENT:
-                        tasks.event(input);
-                        break;
+                case EVENT:
+                    tasks.event(input);
+                    break;
 
-                    case DELETE:
-                        tasks.delete(input);
-                        break;
+                case DELETE:
+                    tasks.delete(input);
+                    break;
 
-                    case ONDATE:
-                        tasks.onDate(input);
-                        break;
+                case ONDATE:
+                    tasks.onDate(input);
+                    break;
 
-                    case UNKNOWN:
-                    default:
-                        throw new UberExceptions("Sorry! I have no idea what you're trying to do.");
+                case UNKNOWN:
+                default:
+                    throw new UberExceptions("Sorry! I have no idea what you're trying to do.");
                 }
             } catch (UberExceptions e) {
                 Ui.printLine();
@@ -71,6 +71,7 @@ public class Ui {
             }
         }
     }
+
     public static void printLine() {
         System.out.print(line + "\n");
     }
@@ -100,7 +101,6 @@ public class Ui {
         }
         printLine();
     }
-
 
 
 }
