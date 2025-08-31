@@ -92,9 +92,13 @@ public class Ui {
                     tasks.onDate(input);
                     break;
 
-                case UNKNOWN:
-                default:
-                    throw new UberExceptions("Sorry! I have no idea what you're trying to do.");
+                    case FIND:
+                        tasks.find(input);
+                        break;
+
+                    case UNKNOWN:
+                    default:
+                        throw new UberExceptions("Sorry! I have no idea what you're trying to do.");
                 }
             } catch (UberExceptions e) {
                 Ui.printLine();
