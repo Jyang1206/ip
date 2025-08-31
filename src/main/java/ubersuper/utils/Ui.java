@@ -8,9 +8,9 @@ import java.util.Scanner;
 
 public class Ui {
 
-    private static final String botName = "UberSuper";
+    private static final String BOT_NAME = "UberSuper";
     private final Scanner sc;
-    private static final String line = "_________________________________";
+    private static final String LINE = "_________________________________";
     private final TaskList tasks;
 
     public Ui(Scanner sc, TaskList tasks) {
@@ -72,7 +72,7 @@ public class Ui {
         }
     }
     public static void printLine() {
-        System.out.print(line + "\n");
+        System.out.print(LINE + "\n");
     }
 
     public void goodBye() {
@@ -83,7 +83,7 @@ public class Ui {
     public void greet(LoadedResult result) {
         // show result if available, if not, do standard greeting
         printLine();
-        System.out.print(" Hello! I'm " + botName + "\n");
+        System.out.print(" Hello! I'm " + BOT_NAME + "\n");
         System.out.print(" What can I do for you?" + "\n");
         if (result.taskSize() > 0 || result.skipped() > 0) {
             printLine();

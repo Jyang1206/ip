@@ -34,7 +34,7 @@ public abstract class Task {
         this.isDone = false;
     }
 
-    public boolean done() {
+    public boolean isDone() {
         return isDone;
     }
 
