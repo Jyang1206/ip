@@ -1,13 +1,15 @@
 package ubersuper.tasks;
 
 import ubersuper.exceptions.UberExceptions;
-import ubersuper.utils.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
+
+import ubersuper.utils.DataStorage;
 import ubersuper.utils.Parser;
+import ubersuper.utils.Ui;
 
 public class TaskList extends ArrayList<Task> {
     private final DataStorage dataStorage;
@@ -169,17 +171,15 @@ public class TaskList extends ArrayList<Task> {
             System.out.println("Items on " + day.format(DateTimeFormatter.ofPattern("MMM dd yyyy")) + ":");
             int i = 1;
             for (Task t : this) {
-                if (t instanceof Deadline) {
-                    Deadline d = (Deadline) t;
+                if (t instanceof Deadline d) {
                     if (d.onDate(day, i)) {
                         i++;
-                    };
-                } else if (t instanceof Event) {
-                    Event ev = (Event) t;
+                    }
+                } else if (t instanceof Event ev) {
                     // consider an event "occurring on" if any part of it touches that date
                     if (ev.onDate(day, i)) {
                         i++;
-                    };
+                    }
 
                 }
             }
