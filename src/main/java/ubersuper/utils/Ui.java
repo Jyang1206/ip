@@ -8,7 +8,7 @@ import java.util.Scanner;
 
 public class Ui {
 
-    private static final String botName = "ubersuper.UberSuper";
+    private static final String botName = "UberSuper";
     private final Scanner sc;
     private static final String line = "_________________________________";
     private final TaskList tasks;
