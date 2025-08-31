@@ -17,17 +17,51 @@ import java.time.format.DateTimeParseException;
 import java.util.List;
 import java.util.stream.Collectors;
 
-// handles saving and loading logic
-// Format: [TaskType] | [Status] | Description | Date/Time
+/**
+ * Stores {@link Task} data to disk and loads them back at startup.
+ *
+ * <h2>Storage file</h2>
+ * <ul>
+ *   <li>Location: {@code data/<fileName>} inside the working directory.</li>
+ *   <li>Format: {@code [TaskType] | [Status] | [Description] | [Date/Time] }</li>
+ *   <li>TaskType: {@code T} (Todo), {@code D} (Deadline), {@code E} (Event)</li>
+ *   <li>Status: {@code 0} for not done, {@code 1} for done</li>
+ *   <li>Date/Time:
+ *     <ul>
+ *       <li>Deadline: one {@code ISO_LOCAL_DATE_TIME} value </li>
+ *       <li>Event   : two {@code ISO_LOCAL_DATE_TIME} values (start | end)</li>
+ *     </ul>
+ *   </li>
+ * </ul>
+ *
+ * <p>The class also ensures the {@code data/} directory and the target file exist
+ * (creating them if missing) before any read/write operation.</p>
+ */
 public class DataStorage {
-
+    /** Absolute/relative path to the backing data file (under {@code data/}). */
         private final Path DATA_PATH;
 
+    /**
+     * Creates a storage that reads/writes to {@code data/<fileName>}.
+     *
+     * @param fileName file name to use inside the {@code data/} folder (e.g., {@code "uberSuper.txt"})
+     */
         public DataStorage(String fileName) {
             DATA_PATH = Paths.get("data", fileName);
         }
 
-        public LoadedResult load() {
+    /**
+     * Loads tasks from disk into a fresh {@link TaskList}.
+     * <ul>
+     *   <li>Silently skips malformed lines and keeps a count in {@link LoadedResult#skipped()}.</li>
+     *   <li>Creates the {@code data/} folder and file if they do not exist.</li>
+     *   <li>Parses timestamps using {@link LocalDateTime#parse(CharSequence)} (expects ISO format).</li>
+     * </ul>
+     *
+     * @return a {@link LoadedResult} containing the populated {@link TaskList},
+     *         number of tasks loaded, and number of lines skipped.
+     */
+    public LoadedResult load() {
             TaskList tasks = new TaskList(this);
             int skipped = 0;
             try {
@@ -110,6 +144,16 @@ public class DataStorage {
             }
         }
 
+    /**
+     * Saves the current {@link TaskList} to disk, overwriting the previous content.
+     * <ul>
+     *   <li>Ensures the {@code data/} directory exists.</li>
+     *   <li>Serializes each task via {@link Task#formattedString()}.</li>
+     *   <li>Writes using UTF-8; truncates the file first.</li>
+     * </ul>
+     *
+     * @param tasks task list to serialize and persist
+     */
         public void save(TaskList tasks) {
             try {
                 if (Files.notExists(DATA_PATH.getParent())) {
