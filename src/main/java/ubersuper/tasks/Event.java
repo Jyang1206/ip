@@ -3,7 +3,6 @@ package ubersuper.tasks;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
-
 /**
  * * A {@link Task} that has a start and end {@link LocalDateTime}.
  * <p>
@@ -54,10 +53,8 @@ public class Event extends Task {
     @Override
     public String toString() {
         return String.format("[%s][%s] %s %s %s",
-                TaskType.EVENT.getSymbol(),
-                isDone() ? "X" : "",
-                desc(),
-                "(from: " + display(this.startTime) + ")",
+                TaskType.EVENT.getSymbol(), isDone() ? "X" : "",
+                desc(), "(from: " + display(this.startTime) + ")",
                 "(to: " + display(this.endTime)) + ")";
     }
 
@@ -73,8 +70,7 @@ public class Event extends Task {
     @Override
     public String formattedString() {
         return String.format("%s | %d | %s | %s | %s",
-                type().getSymbol(),
-                isDone() ? 1 : 0,
+                type().getSymbol(), isDone() ? 1 : 0,
                 desc(),
                 this.startTime.format((STORAGE_DATETIME)),
                 this.endTime.format((STORAGE_DATETIME)));

@@ -1,10 +1,12 @@
 package ubersuper;
 
-import java.util.Scanner;
+import ubersuper.tasks.TaskList;
 import ubersuper.utils.DataStorage;
 import ubersuper.utils.LoadedResult;
 import ubersuper.utils.Ui;
-import ubersuper.tasks.TaskList;
+
+import java.util.Scanner;
+
 /**
  * Entry point of the UberSuper application.
  * <p>

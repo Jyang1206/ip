@@ -34,8 +34,7 @@ public enum CommandType {
     public String getKeyword() {
         return keyword;
     }
-
-/**
+    /**
  * Parses the user's input into a {@link CommandType}.
  * <p><strong>Rules:</strong></p>
  * <ul>
