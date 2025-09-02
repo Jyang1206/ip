@@ -1,6 +1,7 @@
 package ubersuper.utils;
 
 import ubersuper.exceptions.UberExceptions;
+import ubersuper.utils.command.CommandType;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -8,6 +9,13 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 
 /**
+ * Parsing user input is done via {@link #fromInput(String)}, which:
+ * <ul>
+ *   <li>is case-insensitive (e.g., {@code "Bye"}, {@code "BYE"} → {@link #BYE}),</li>
+ *   <li>matches the <em>first whitespace-delimited token</em> only,</li>
+ *   <li>requires an exact token match (no prefix matching; e.g., {@code "listall"} → {@link #UNKNOWN}),</li>
+ *   <li>is null/blank-safe (null or blank input → {@link #UNKNOWN}).</li>
+ * </ul>
  * Utility for parsing user-supplied date/time strings into {@link LocalDateTime}.
  * <p>
  * The parser is intentionally permissive and accepts several common formats.
@@ -29,6 +37,35 @@ import java.time.format.DateTimeParseException;
  * is thrown with a helpful message.</p>
  */
 public class Parser {
+
+    /**
+     * Parses the user's input into a {@link CommandType}.
+     * <p><strong>Rules:</strong></p>
+     * <ul>
+     *   <li>Extracts the first whitespace-delimited token and lower-cases it.</li>
+     *   <li>Performs exact token match against known commands (no prefix/substring match).</li>
+     *   <li>Returns CommandType.UNKNOWN if the token does not match any command,
+     *   or if input is null/blank.</li>
+     * </ul>
+     *
+     * @param input full user input line
+     * @return matching {@link CommandType} or CommandType.UNKNOWN if none
+     */
+    public static CommandType fromInput(String input) {
+
+        if (input == null || input.isBlank()) {
+            return CommandType.UNKNOWN;
+        }
+
+        String head = input.strip().split("\\s+", 2)[0].toLowerCase();
+
+        for (CommandType c : CommandType.values()) {
+            if (head.equals(c.getKeyword())) {
+                return c;
+            }
+        }
+        return CommandType.UNKNOWN;
+    }
 
     /**
      * Parses a date/time string into a {@link LocalDateTime}.

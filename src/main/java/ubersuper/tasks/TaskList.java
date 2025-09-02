@@ -1,15 +1,15 @@
 package ubersuper.tasks;
 
 import ubersuper.exceptions.UberExceptions;
+import ubersuper.utils.DataStorage;
+import ubersuper.utils.Parser;
+import ubersuper.utils.ui.Ui;
+
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
-
-import ubersuper.utils.DataStorage;
-import ubersuper.utils.Parser;
-import ubersuper.utils.Ui;
 
 /**
  * Mutable list of {@link Task} items plus high-level operations used by the UI.
@@ -39,9 +39,11 @@ public class TaskList extends ArrayList<Task> {
      * Marks the i-th task as done (1-based index), saves the list, and prints a confirmation.
      *
      * @param input full user input line, e.g., {@code "mark 3"}
+     * @return String message
      * @throws UberExceptions if the index is missing or out of range
      */
-    public void mark(String input) {
+    public String mark(String input) {
+        String message = "";
         String[] parts = input.split("\\s+", 2);
         int i = Integer.parseInt(parts[1]);
 
@@ -53,23 +55,25 @@ public class TaskList extends ArrayList<Task> {
             t.mark();
             // save after changing done status
             dataStorage.save(this);
-            Ui.printLine();
-            System.out.print("Nice! I've marked this task as done: \n");
-            System.out.print(t + "\n");
-            Ui.printLine();
+            message += Ui.printLine();
+            message += "Nice! I've marked this task as done: \n";
+            message += t + "\n";
+            message += Ui.printLine();
         } catch (UberExceptions e) {
-            Ui.printLine();
-            System.out.print(e.getMessage() + "\n");
-            Ui.printLine();
+            return Ui.printLine() + e.getMessage() + "\n" + Ui.printLine();
         }
+        return message;
     }
+
     /**
      * Marks the i-th task as not done (1-based index), saves the list, and prints a confirmation.
      *
      * @param input full user input line, e.g., {@code "unmark 2"}
+     * @return String message
      * @throws UberExceptions if the index is missing or out of range
      */
-    public void unmark(String input) {
+    public String unmark(String input) {
+        String message = "";
         String[] parts = input.split("\\s+", 2);
         int i = Integer.parseInt(parts[1]);
         try {
@@ -79,16 +83,14 @@ public class TaskList extends ArrayList<Task> {
             Task t = this.get(i - 1);
             t.unmark();
             dataStorage.save(this);
-            Ui.printLine();
-            System.out.print("Ok, I've marked this task as not done yet: \n");
-            System.out.print(t + "\n");
-            Ui.printLine();
+            message += Ui.printLine();
+            message += "Ok, I've marked this task as not done yet: \n";
+            message += t + "\n";
+            message += Ui.printLine();
         } catch (UberExceptions e) {
-            Ui.printLine();
-            System.out.print(e.getMessage() + "\n");
-            Ui.printLine();
+            return Ui.printLine() + e.getMessage() + "\n" + Ui.printLine();
         }
-
+        return message;
     }
 
     /**
@@ -96,34 +98,36 @@ public class TaskList extends ArrayList<Task> {
      * <p>Expected format: {@code "todo <description>"}.</p>
      *
      * @param input full user input line
+     * @return String message
      * @throws UberExceptions if the description is missing/blank
      */
-    public void todo(String input) {
+    public String todo(String input) {
+        String message = "";
         try {
             String[] parts = input.split("\\s+", 2);
             if (parts.length < 2 || parts[1].trim().isEmpty()) {
                 throw new UberExceptions("You forgot to include what you're supposed to do");
             }
             Todo t = new Todo(parts[1].trim());
-            this.add(t);
-            this.save(t);
+            return this.add(t) + this.save(t);
         } catch (UberExceptions e) {
             Ui.printLine();
             System.out.print(e.getMessage() + "\n");
             Ui.printLine();
         }
     }
+
     /**
      * Stores the current list and prints the "added" confirmation for the provided task.
-     *
+     * @return String message
      * @param t the task that was just added
      */
-    public void save(Task t) {
+    public String save(Task t) {
+        String message = "";
         dataStorage.save(this);
-        String message = String.format("You now have %d tasks in the list \n", this.size());
-        Ui.printLine();
-        System.out.print("Got it! I've added this task:\n" + t + "\n" + message);
-        Ui.printLine();
+        message += String.format("You now have %d tasks in the list \n", this.size());
+        message = Ui.printLine() + "Got it! I've added this task:\n" + t + "\n" + message + Ui.printLine();
+        return message;
     }
 
     /**
@@ -136,9 +140,10 @@ public class TaskList extends ArrayList<Task> {
      * </p>
      *
      * @param input full user input line
+     * @return String message
      * @throws UberExceptions if the format is wrong or date-time cannot be parsed
      */
-    public void deadline(String input) {
+    public String deadline(String input) {
         try {
             String[] parts = input.split("/");
             if (parts.length < 2) {
@@ -155,14 +160,10 @@ public class TaskList extends ArrayList<Task> {
             }
             LocalDateTime dl = Parser.parseWhen(p2);
             Deadline d = new Deadline(desc, dl);
-            add(d);
-            save(d);
+            return this.add(d) + this.save(d);
         } catch (UberExceptions e) {
-            Ui.printLine();
-            System.out.print(e.getMessage() + "\n");
-            Ui.printLine();
+            return Ui.printLine() + e.getMessage() + "\n" + Ui.printLine();
         }
-
     }
 
     /**
@@ -174,9 +175,10 @@ public class TaskList extends ArrayList<Task> {
      * </p>
      *
      * @param input full user input line
+     * @return String message
      * @throws UberExceptions if the format is wrong, dates cannot be parsed, or end &lt; start
      */
-    public void event(String input) {
+    public String event(String input) {
         try {
             String[] parts = input.split("/");
             if (parts.length < 2) {
@@ -187,7 +189,7 @@ public class TaskList extends ArrayList<Task> {
 
             String desc = parts[0].replaceFirst("event", "").trim();
             String fromPart = parts[1].trim(); // "from ..."
-            String toPart   = parts[2].trim(); // "to ..."
+            String toPart = parts[2].trim(); // "to ..."
 
             if (desc.isEmpty()) {
                 throw new UberExceptions("Please describe the event");
@@ -204,12 +206,9 @@ public class TaskList extends ArrayList<Task> {
                 throw new UberExceptions("End time cannot be before start time.");
             }
             Event ev = new Event(desc, startTime, endTime);
-            add(ev);
-            save(ev);
+            return this.add(ev) + this.save(ev);
         } catch (UberExceptions e) {
-            Ui.printLine();
-            System.out.print(e.getMessage() + "\n");
-            Ui.printLine();
+            return Ui.printLine() + e.getMessage() + "\n" + Ui.printLine();
         }
     }
 
@@ -229,10 +228,13 @@ public class TaskList extends ArrayList<Task> {
      * @param input full user input line, e.g., {@code "onDate 2019-12-02"}
      * @throws UberExceptions if the date cannot be parsed
      */
-    public void onDate(String input) {
+    public String onDate(String input) {
+        String message = "";
         try {
             String[] parts = input.split("\\s+", 2);
-            if (parts.length < 2) throw new UberExceptions("Use: onDate <yyyy-mm-dd | dd/MM/yyyy>");
+            if (parts.length < 2) {
+                throw new UberExceptions("Use: onDate <yyyy-mm-dd | dd/MM/yyyy>");
+            }
             LocalDate day;
             String raw = parts[1].trim();
             try {
@@ -245,9 +247,8 @@ public class TaskList extends ArrayList<Task> {
                     throw new UberExceptions("Use: onDate <yyyy-mm-dd | dd/MM/yyyy>");
                 }
             }
-
-            Ui.printLine();
-            System.out.println("Items on " + day.format(DateTimeFormatter.ofPattern("MMM dd yyyy")) + ":");
+            message += Ui.printLine();
+            message += "Items on " + day.format(DateTimeFormatter.ofPattern("MMM dd yyyy")) + ":";
             int i = 1;
             for (Task t : this) {
                 if (t instanceof Deadline d) {
@@ -259,30 +260,32 @@ public class TaskList extends ArrayList<Task> {
                     if (ev.onDate(day, i)) {
                         i++;
                     }
-
                 }
             }
-            if (i == 1) System.out.println("(No items.)");
-            Ui.printLine();
+            if (i == 1) {
+                message += "(No items.)";
+            }
+            message += Ui.printLine();
         } catch (UberExceptions e) {
-            Ui.printLine();
-            System.out.print(e.getMessage() + "\n");
-            Ui.printLine();
+            return Ui.printLine() + e.getMessage() + "\n" + Ui.printLine();
         }
+        return message;
     }
 
     /**
-     * Prints all tasks with their 1-based indices.
+     * Returns a String of all tasks with their 1-based indices.
      */
-    public void list() {
-        Ui.printLine();
+    public String list() {
+        String message = "";
+        message += Ui.printLine();
         int listNum = 1;
-        System.out.print("Here are the tasks in your list:\n");
+        message += "Here are the tasks in your list:\n";
         for (Task task : this) {
-            System.out.print(listNum + ". " + task + "\n");
+            message += listNum + ". " + task + "\n";
             listNum++;
         }
-        Ui.printLine();
+        message += Ui.printLine();
+        return message;
     }
 
     /**
@@ -291,7 +294,8 @@ public class TaskList extends ArrayList<Task> {
      * @param input full user input line, e.g., {@code "delete 1"}
      * @throws UberExceptions if the index is missing or out of range
      */
-    public void delete(String input) {
+    public String delete(String input) {
+        String message = "";
         String[] parts = input.split("\\s+", 2);
         int i = Integer.parseInt(parts[1]);
         try {
@@ -301,16 +305,15 @@ public class TaskList extends ArrayList<Task> {
             Task t = this.get(i - 1);
             this.remove(i - 1);
             dataStorage.save(this);
-            String message = String.format("You now have %d tasks in the list \n", this.size());
-            Ui.printLine();
-            System.out.print("Ok, I've removed this task from the list: \n");
-            System.out.print(t + "\n");
-            System.out.print(message);
-            Ui.printLine();
+            message += String.format("You now have %d tasks in the list \n", this.size());
+            message = Ui.printLine()
+                    + "Ok, I've removed this task from the list: \n"
+                    + t + "\n"
+                    + message
+                    + Ui.printLine();
         } catch (UberExceptions e) {
-            Ui.printLine();
-            System.out.print(e.getMessage() + "\n");
-            Ui.printLine();
+            return Ui.printLine() + e.getMessage() + "\n" + Ui.printLine();
         }
+        return message;
     }
 }

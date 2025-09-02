@@ -1,7 +1,9 @@
-package ubersuper.utils;
+package ubersuper.utils.ui;
 
 import ubersuper.exceptions.UberExceptions;
 import ubersuper.tasks.TaskList;
+import ubersuper.utils.LoadedResult;
+import ubersuper.utils.Parser;
 import ubersuper.utils.command.CommandType;
 
 import java.util.Scanner;
@@ -18,13 +20,13 @@ import java.util.Scanner;
  * <p>
  * This class does not mutate storage directly; all task operations are delegated
  * to {@link TaskList}. The command parsing of the first token is handled by
- * {@link CommandType#fromInput(String)}.
+ * {@link Parser#fromInput(String)}.
  */
 public class Ui {
 
     private static final String BOT_NAME = "UberSuper";
-    private final Scanner sc;
     private static final String LINE = "_________________________________";
+    private final Scanner sc;
     private final TaskList tasks;
 
     /**
@@ -43,65 +45,46 @@ public class Ui {
      * Runs the main command loop.
      * <p>
      * Reads one line at a time from the {@link Scanner}, determines the command
-     * using {@link CommandType#fromInput(String)}, and invokes the corresponding
+     * using {@link Parser#fromInput(String)}, and invokes the corresponding
      * operation on {@link TaskList}. The loop terminates when the user enters
      * the {@code bye} command, after printing a farewell message.
      * <p>
      * If a command is unknown or a handler throws an {@link UberExceptions},
      * an error message is printed and the loop continues to read the next line.
      */
-    public void echo() {
+    public String echo() {
         while (sc.hasNextLine()) {
             String input = sc.nextLine().trim();
-            CommandType command = CommandType.fromInput(input);
+            CommandType command = Parser.fromInput(input);
             try {
                 switch (command) {
                 case BYE:
-                    goodBye();
-                    return;
-
+                    return goodBye();
                 case LIST:
-                    tasks.list();
-                    break;
-
+                    return tasks.list();
                 case MARK:
-                    tasks.mark(input);
-                    break;
-
+                    return tasks.mark(input);
                 case UNMARK:
-                    tasks.unmark(input);
-                    break;
-
+                    return tasks.unmark(input);
                 case TODO:
-                    tasks.todo(input);
-                    break;
-
+                    return tasks.todo(input);
                 case DEADLINE:
-                    tasks.deadline(input);
-                    break;
-
+                    return tasks.deadline(input);
                 case EVENT:
-                    tasks.event(input);
-                    break;
-
+                    return tasks.event(input);
                 case DELETE:
-                    tasks.delete(input);
-                    break;
-
+                    return tasks.delete(input);
                 case ONDATE:
-                    tasks.onDate(input);
-                    break;
-
+                    return tasks.onDate(input);
                 case UNKNOWN:
                 default:
                     throw new UberExceptions("Sorry! I have no idea what you're trying to do.");
                 }
             } catch (UberExceptions e) {
-                Ui.printLine();
-                System.out.print(e.getMessage() + "\n");
-                Ui.printLine();
+                return Ui.printLine() + e.getMessage() + "\n" +  Ui.printLine();
             }
         }
+        return null;
     }
 
     /**
@@ -110,18 +93,19 @@ public class Ui {
      * This is a convenience utility so other classes can use the same divider.
      */
 
-    public static void printLine() {
-        System.out.print(LINE + "\n");
+    public static String printLine() {
+        return LINE + "\n";
     }
 
     /**
      * Prints the farewell message and a divider line.
      * <p>
      * Typically invoked when the {@code bye} command is received.
+     *
+     * @return
      */
-    public void goodBye() {
-        System.out.print("Bye. Hope to see you again soon! \n");
-        printLine();
+    public String goodBye() {
+        return "Bye. Hope to see you again soon! \n" + printLine();
     }
 
 
