@@ -21,7 +21,9 @@ public class Todo extends Task {
      * @return always {@code false}
      */
     @Override
-    public boolean onDate(LocalDate day, int i) { return false; }
+    public boolean onDate(LocalDate day, int i) {
+        return false;
+    }
 
     /**
      * Returns the storage-line form of this task:

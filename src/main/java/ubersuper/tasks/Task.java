@@ -18,22 +18,30 @@ import java.time.format.DateTimeFormatter;
  * </ul>
  */
 public abstract class Task {
+    // ===== Dates & Times =====
+    /**
+     * ISO local date used for storage (e.g., {@code 2019-12-02}).
+     */
+    public final DateTimeFormatter STORAGE_DATE = DateTimeFormatter.ISO_LOCAL_DATE;
+
+    /**
+     * ISO local date-time used for storage (e.g., {@code 2019-12-02T18:00:00}).
+     */
+    public final DateTimeFormatter STORAGE_DATETIME = DateTimeFormatter.ISO_LOCAL_DATE_TIME;
+
+    /**
+     * Human-friendly date (e.g., {@code Dec 02 2019}).
+     */
+    private final DateTimeFormatter DISPLAY_DATE = DateTimeFormatter.ofPattern("MMM dd yyyy");
+
+    /**
+     * Human-friendly date-time (e.g., {@code 2019-12-02 18:00}).
+     */
+    private final DateTimeFormatter DISPLAY_DATETIME = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+
     private boolean isDone = false;
     private final String description;
     private final TaskType type;
-
-    // ===== Dates & Times =====
-    /** Human-friendly date (e.g., {@code Dec 02 2019}). */
-    private final DateTimeFormatter DISPLAY_DATE = DateTimeFormatter.ofPattern("MMM dd yyyy");
-
-    /** Human-friendly date-time (e.g., {@code 2019-12-02 18:00}). */
-    private final DateTimeFormatter DISPLAY_DATETIME = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
-
-    /** ISO local date used for storage (e.g., {@code 2019-12-02}). */
-    public final DateTimeFormatter STORAGE_DATE = DateTimeFormatter.ISO_LOCAL_DATE;
-
-    /** ISO local date-time used for storage (e.g., {@code 2019-12-02T18:00:00}). */
-    public final DateTimeFormatter STORAGE_DATETIME = DateTimeFormatter.ISO_LOCAL_DATE_TIME;
 
     /**
      * Returns the single-line, pipe-separated representation of this task.
@@ -56,7 +64,7 @@ public abstract class Task {
      * @param i   1-based index to print if the task matches
      * @return {@code true} if printed; {@code false} otherwise
      */
-    abstract public boolean onDate(LocalDate day , int i);
+    abstract public boolean onDate(LocalDate day, int i);
 
     /**
      * Creates a task with the given description and type.
@@ -93,12 +101,10 @@ public abstract class Task {
     public TaskType type() {
         return type;
     }
+
     @Override
     public String toString() {
-        return String.format("[%s][%s] %s",
-                type.getSymbol(),
-                isDone ? "X" : "",
-                description);
+        return String.format("[%s][%s] %s", type.getSymbol(), isDone ? "X" : "", description);
     }
 
     /**
