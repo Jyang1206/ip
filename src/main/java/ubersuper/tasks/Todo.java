@@ -21,7 +21,7 @@ public class Todo extends Task {
      * @return always {@code false}
      */
     @Override
-    public boolean onDate(LocalDate day, int i) {
+    public boolean isOnDate(LocalDate day) {
         return false;
     }
 

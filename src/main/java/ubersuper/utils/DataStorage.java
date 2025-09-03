@@ -43,10 +43,6 @@ public class DataStorage {
     /**
      * Absolute/relative path to the backing data file (under {@code data/}).
      */
-    @SuppressWarnings({"checkstyle:AbbreviationAsWordInName",
-        "checkstyle:MemberName",
-                       "checkstyle:Indentation",
-                       "checkstyle:CommentsIndentation", "checkstyle:LineLength"})
     private final Path dataPath;
 
     /**

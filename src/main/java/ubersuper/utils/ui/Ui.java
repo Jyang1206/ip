@@ -1,127 +1,98 @@
-package ubersuper.utils;
+package ubersuper.utils.ui;
 
 import ubersuper.exceptions.UberExceptions;
 import ubersuper.tasks.TaskList;
+import ubersuper.utils.LoadedResult;
+import ubersuper.utils.Parser;
 import ubersuper.utils.command.CommandType;
 
-import java.util.Scanner;
+
 
 /**
  * Handles all user-facing I/O for the UberSuper app.
  * <p>
  * Responsibilities:
  * <ul>
- *   <li>Reading user commands from a {@link Scanner}</li>
  *   <li>Routing recognized commands to the appropriate {@link TaskList} methods</li>
  *   <li>Printing standard UI messages (greeting, divider line, goodbye, errors)</li>
  * </ul>
  * <p>
  * This class does not mutate storage directly; all task operations are delegated
  * to {@link TaskList}. The command parsing of the first token is handled by
- * {@link CommandType#fromInput(String)}.
+ * {@link Parser#fromInput(String)}.
  */
 public class Ui {
 
     private static final String BOT_NAME = "UberSuper";
-    private final Scanner sc;
     private static final String LINE = "_________________________________";
     private final TaskList tasks;
 
     /**
-     * Constructs a {@code Ui} that will read commands from the given {@link Scanner}
-     * and dispatch them to the provided {@link TaskList}.
-     *
-     * @param sc    input source for user commands (not closed by this class)
      * @param tasks the task list to operate on when handling commands
      */
-    public Ui(Scanner sc, TaskList tasks) {
-        this.sc = sc;
+    public Ui(TaskList tasks) {
         this.tasks = tasks;
     }
-
     /**
      * Runs the main command loop.
      * <p>
-     * Reads one line at a time from the {@link Scanner}, determines the command
-     * using {@link CommandType#fromInput(String)}, and invokes the corresponding
+     * using {@link Parser#fromInput(String)}, and invokes the corresponding
      * operation on {@link TaskList}. The loop terminates when the user enters
      * the {@code bye} command, after printing a farewell message.
      * <p>
      * If a command is unknown or a handler throws an {@link UberExceptions},
      * an error message is printed and the loop continues to read the next line.
      */
-    public void echo() {
-        while (sc.hasNextLine()) {
-            String input = sc.nextLine().trim();
-            CommandType command = CommandType.fromInput(input);
-            try {
-                switch (command) {
-                case BYE:
-                    goodBye();
-                    return;
-
-                case LIST:
-                    tasks.list();
-                    break;
-
-                case MARK:
-                    tasks.mark(input);
-                    break;
-
-                case UNMARK:
-                    tasks.unmark(input);
-                    break;
-
-                case TODO:
-                    tasks.todo(input);
-                    break;
-
-                case DEADLINE:
-                    tasks.deadline(input);
-                    break;
-
-                case EVENT:
-                    tasks.event(input);
-                    break;
-
-                case DELETE:
-                    tasks.delete(input);
-                    break;
-
-                case ONDATE:
-                    tasks.onDate(input);
-                    break;
-
-                case UNKNOWN:
-                default:
-                    throw new UberExceptions("Sorry! I have no idea what you're trying to do.");
-                }
-            } catch (UberExceptions e) {
-                Ui.printLine();
-                System.out.print(e.getMessage() + "\n");
-                Ui.printLine();
+    public String echo(String raw) {
+        String input = raw.trim();
+        CommandType command = Parser.fromInput(input);
+        try {
+            switch (command) {
+            case BYE:
+                return goodBye();
+            case LIST:
+                return tasks.list();
+            case MARK:
+                return tasks.mark(input);
+            case UNMARK:
+                return tasks.unmark(input);
+            case TODO:
+                return tasks.todo(input);
+            case DEADLINE:
+                return tasks.deadline(input);
+            case EVENT:
+                return tasks.event(input);
+            case DELETE:
+                return tasks.delete(input);
+            case ONDATE:
+                return tasks.onDate(input);
+            case UNKNOWN:
+            default:
+                throw new UberExceptions("Sorry! I have no idea what you're trying to do.");
             }
+        } catch (UberExceptions e) {
+            return Ui.printLine() + e.getMessage() + "\n" + Ui.printLine();
         }
     }
-
     /**
      * Prints a standard horizontal divider line used by the UI.
      * <p>
      * This is a convenience utility so other classes can use the same divider.
      */
 
-    public static void printLine() {
-        System.out.print(LINE + "\n");
+    public static String printLine() {
+        return LINE + "\n";
     }
 
     /**
      * Prints the farewell message and a divider line.
      * <p>
      * Typically invoked when the {@code bye} command is received.
+     *
+     * @return
      */
-    public void goodBye() {
-        System.out.print("Bye. Hope to see you again soon! \n");
-        printLine();
+    public String goodBye() {
+        return "Bye. Hope to see you again soon! \n" + printLine();
     }
 
 
@@ -154,6 +125,5 @@ public class Ui {
         }
         printLine();
     }
-
-
 }
+

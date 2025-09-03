@@ -37,17 +37,13 @@ public class Event extends Task {
      * If matched, prints a numbered line and returns {@code true}.
      *
      * @param day date to test for overlap
-     * @param i   1-based index to print if matched
      * @return {@code true} if printed (overlaps the day); {@code false} otherwise
      */
-    public boolean onDate(LocalDate day, int i) {
+    @Override
+    public boolean isOnDate(LocalDate day) {
         LocalDate s = this.startTime.toLocalDate();
         LocalDate e = this.endTime.toLocalDate();
-        if (!day.isBefore(s) && !day.isAfter(e)) {
-            System.out.println(i++ + ". " + this);
-            return true;
-        }
-        return false;
+        return !day.isBefore(s) && !day.isAfter(e);
     }
 
     @Override
