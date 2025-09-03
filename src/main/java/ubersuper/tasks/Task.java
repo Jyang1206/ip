@@ -14,7 +14,7 @@ import java.time.format.DateTimeFormatter;
  * Subclasses must provide:
  * <ul>
  *   <li>{@link #formattedString()} — a single-line pipe-separated form for storage</li>
- *   <li>{@link #onDate(LocalDate, int)} — logic to decide if/what to print when filtering by date</li>
+ *   <li>{@link #isOnDate(LocalDate)} — logic to decide if/what to print when filtering by date</li>
  * </ul>
  */
 public abstract class Task {
@@ -61,10 +61,9 @@ public abstract class Task {
      * </ol>
      *
      * @param day date being queried
-     * @param i   1-based index to print if the task matches
      * @return {@code true} if printed; {@code false} otherwise
      */
-    abstract public boolean onDate(LocalDate day, int i);
+    abstract public boolean isOnDate(LocalDate day);
 
     /**
      * Creates a task with the given description and type.

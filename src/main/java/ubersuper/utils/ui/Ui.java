@@ -6,14 +6,13 @@ import ubersuper.utils.LoadedResult;
 import ubersuper.utils.Parser;
 import ubersuper.utils.command.CommandType;
 
-import java.util.Scanner;
+
 
 /**
  * Handles all user-facing I/O for the UberSuper app.
  * <p>
  * Responsibilities:
  * <ul>
- *   <li>Reading user commands from a {@link Scanner}</li>
  *   <li>Routing recognized commands to the appropriate {@link TaskList} methods</li>
  *   <li>Printing standard UI messages (greeting, divider line, goodbye, errors)</li>
  * </ul>
@@ -26,25 +25,17 @@ public class Ui {
 
     private static final String BOT_NAME = "UberSuper";
     private static final String LINE = "_________________________________";
-    private final Scanner sc;
     private final TaskList tasks;
 
     /**
-     * Constructs a {@code Ui} that will read commands from the given {@link Scanner}
-     * and dispatch them to the provided {@link TaskList}.
-     *
-     * @param sc    input source for user commands (not closed by this class)
      * @param tasks the task list to operate on when handling commands
      */
-    public Ui(Scanner sc, TaskList tasks) {
-        this.sc = sc;
+    public Ui(TaskList tasks) {
         this.tasks = tasks;
     }
-
     /**
      * Runs the main command loop.
      * <p>
-     * Reads one line at a time from the {@link Scanner}, determines the command
      * using {@link Parser#fromInput(String)}, and invokes the corresponding
      * operation on {@link TaskList}. The loop terminates when the user enters
      * the {@code bye} command, after printing a farewell message.
@@ -52,41 +43,37 @@ public class Ui {
      * If a command is unknown or a handler throws an {@link UberExceptions},
      * an error message is printed and the loop continues to read the next line.
      */
-    public String echo() {
-        while (sc.hasNextLine()) {
-            String input = sc.nextLine().trim();
-            CommandType command = Parser.fromInput(input);
-            try {
-                switch (command) {
-                case BYE:
-                    return goodBye();
-                case LIST:
-                    return tasks.list();
-                case MARK:
-                    return tasks.mark(input);
-                case UNMARK:
-                    return tasks.unmark(input);
-                case TODO:
-                    return tasks.todo(input);
-                case DEADLINE:
-                    return tasks.deadline(input);
-                case EVENT:
-                    return tasks.event(input);
-                case DELETE:
-                    return tasks.delete(input);
-                case ONDATE:
-                    return tasks.onDate(input);
-                case UNKNOWN:
-                default:
-                    throw new UberExceptions("Sorry! I have no idea what you're trying to do.");
-                }
-            } catch (UberExceptions e) {
-                return Ui.printLine() + e.getMessage() + "\n" +  Ui.printLine();
+    public String echo(String raw) {
+        String input = raw.trim();
+        CommandType command = Parser.fromInput(input);
+        try {
+            switch (command) {
+            case BYE:
+                return goodBye();
+            case LIST:
+                return tasks.list();
+            case MARK:
+                return tasks.mark(input);
+            case UNMARK:
+                return tasks.unmark(input);
+            case TODO:
+                return tasks.todo(input);
+            case DEADLINE:
+                return tasks.deadline(input);
+            case EVENT:
+                return tasks.event(input);
+            case DELETE:
+                return tasks.delete(input);
+            case ONDATE:
+                return tasks.onDate(input);
+            case UNKNOWN:
+            default:
+                throw new UberExceptions("Sorry! I have no idea what you're trying to do.");
             }
+        } catch (UberExceptions e) {
+            return Ui.printLine() + e.getMessage() + "\n" + Ui.printLine();
         }
-        return null;
     }
-
     /**
      * Prints a standard horizontal divider line used by the UI.
      * <p>
@@ -138,6 +125,5 @@ public class Ui {
         }
         printLine();
     }
-
-
 }
+

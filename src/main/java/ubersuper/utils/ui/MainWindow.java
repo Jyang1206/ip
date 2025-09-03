@@ -24,8 +24,8 @@ public class MainWindow extends AnchorPane {
 
     private UberSuper uberSuper;
 
-    private Image userImage = new Image(this.getClass().getResourceAsStream("/images/DaUser.png"));
-    private Image uberSuperImage = new Image(this.getClass().getResourceAsStream("/images/DaDuke.png"));
+    private final Image userImage = new Image(this.getClass().getResourceAsStream("/images/DaUser.png"));
+    private final Image uberSuperImage = new Image(this.getClass().getResourceAsStream("/images/DaDuke.png"));
 
     @FXML
     public void initialize() {
@@ -47,7 +47,7 @@ public class MainWindow extends AnchorPane {
         String response = uberSuper.getResponse(input);
         dialogContainer.getChildren().addAll(
                 DialogBox.getUserDialog(input, userImage),
-                DialogBox.getDukeDialog(response, uberSuperImage)
+                DialogBox.getUberDialog(response, uberSuperImage)
         );
         userInput.clear();
     }

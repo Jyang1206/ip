@@ -109,18 +109,18 @@ public class TaskList extends ArrayList<Task> {
                 throw new UberExceptions("You forgot to include what you're supposed to do");
             }
             Todo t = new Todo(parts[1].trim());
-            return this.add(t) + this.save(t);
+            this.add(t);
+            return this.save(t);
         } catch (UberExceptions e) {
-            Ui.printLine();
-            System.out.print(e.getMessage() + "\n");
-            Ui.printLine();
+            return Ui.printLine() + e.getMessage() + "\n" + Ui.printLine();
         }
     }
 
     /**
      * Stores the current list and prints the "added" confirmation for the provided task.
-     * @return String message
+     *
      * @param t the task that was just added
+     * @return String message
      */
     public String save(Task t) {
         String message = "";
@@ -160,7 +160,8 @@ public class TaskList extends ArrayList<Task> {
             }
             LocalDateTime dl = Parser.parseWhen(p2);
             Deadline d = new Deadline(desc, dl);
-            return this.add(d) + this.save(d);
+            this.add(d);
+            return this.save(d);
         } catch (UberExceptions e) {
             return Ui.printLine() + e.getMessage() + "\n" + Ui.printLine();
         }
@@ -206,7 +207,8 @@ public class TaskList extends ArrayList<Task> {
                 throw new UberExceptions("End time cannot be before start time.");
             }
             Event ev = new Event(desc, startTime, endTime);
-            return this.add(ev) + this.save(ev);
+            this.add(ev);
+            return this.save(ev);
         } catch (UberExceptions e) {
             return Ui.printLine() + e.getMessage() + "\n" + Ui.printLine();
         }
@@ -252,13 +254,13 @@ public class TaskList extends ArrayList<Task> {
             int i = 1;
             for (Task t : this) {
                 if (t instanceof Deadline d) {
-                    if (d.onDate(day, i)) {
-                        i++;
+                    if (d.isOnDate(day)) {
+                        message += i++ + ". " + this;
                     }
                 } else if (t instanceof Event ev) {
                     // consider an event "occurring on" if any part of it touches that date
-                    if (ev.onDate(day, i)) {
-                        i++;
+                    if (ev.isOnDate(day)) {
+                        message += i++ + ". " + this;
                     }
                 }
             }

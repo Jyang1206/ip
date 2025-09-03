@@ -31,17 +31,12 @@ public class Deadline extends Task {
      * a numbered entry (e.g., {@code "3. [D][ ] ..."}) and returns {@code true}.
      *
      * @param day date to compare with the deadline's date portion
-     * @param i   1-based index to print alongside the task if it matches
      * @return {@code true} if the deadline is on {@code day} and was printed; {@code false} otherwise
      */
     @Override
-    public boolean onDate(LocalDate day, int i) {
+    public boolean isOnDate(LocalDate day) {
         LocalDate d = this.deadLine.toLocalDate();
-        if (d.equals(day)) {
-            System.out.println(i++ + ". " + this);
-            return true;
-        }
-        return false;
+        return d.equals(day);
     }
 
     @Override
