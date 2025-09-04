@@ -105,25 +105,26 @@ public class Ui {
      *
      * @param result the outcome of loading tasks from disk
      */
-    public void greet(LoadedResult result) {
+    public String greet(LoadedResult result) {
+        String message = "";
         // show result if available, if not, do standard greeting
-        printLine();
-        System.out.print(" Hello! I'm " + BOT_NAME + "\n");
-        System.out.print(" What can I do for you?" + "\n");
+        message += printLine() + " Hello! I'm " + BOT_NAME + "\n" + " What can I do for you?" + "\n";
         if (result.taskSize() > 0 || result.skipped() > 0) {
-            printLine();
-            System.out.print(String.format(" (Loaded %d tasks from disk%s)\n",
+            message += printLine();
+            message += String.format(" (Loaded %d tasks from disk%s)\n",
                     result.taskSize(),
                     result.skipped() > 0
                             ? String.format(", skipped %d corrupted lines",
                             result.skipped())
-                            : ""));
-            result.tasks().list();
+                            : "");
+            message += result.tasks().list();
         } else {
-            printLine();
-            System.out.print(" There are currently no tasks in your list \n");
+            message += printLine();
+            message += " There are currently no tasks in your list \n";
         }
-        printLine();
+        message += printLine();
+        return message;
     }
 }
+
 

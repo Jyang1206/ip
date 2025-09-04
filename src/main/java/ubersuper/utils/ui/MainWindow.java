@@ -35,6 +35,9 @@ public class MainWindow extends AnchorPane {
     /** Injects the Duke instance */
     public void setUberSuper(UberSuper us) {
         uberSuper = us;
+        dialogContainer.getChildren().add(
+                DialogBox.getUberDialog(uberSuper.greet(), uberSuperImage)
+        );
     }
 
     /**
