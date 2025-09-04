@@ -327,9 +327,11 @@ public class TaskList extends ArrayList<Task> {
      *   find book
      *   find return book
      * </pre>
+     * @return String message
      * Matching is OR across keywords: a task is listed if its description contains at least one keyword.
      */
-    public void find(String input) {
+    public String find(String input) {
+        String message = "";
         String[] parts = input.split("\\s+", 2);
         if (parts.length < 2 || parts[1].isBlank()) {
             throw new UberExceptions("Use: find <keyword(s)>");
@@ -338,22 +340,22 @@ public class TaskList extends ArrayList<Task> {
         // Split the query into keywords and match, case-insensitive
         String[] keywords = parts[1].toLowerCase().split("\\s+");
 
-        Ui.printLine();
-        System.out.print("Here are the matching tasks in your list:\n");
+        message += Ui.printLine() + "Here are the matching tasks in your list:\n";
 
         int i = 1;
         for (Task t: this) {
             String lowerCaseDesc = t.desc().toLowerCase();
             for (String k : keywords) {
                 if (!k.isBlank() && lowerCaseDesc.contains(k)) {
-                    System.out.print(i++ + ". " + t + "\n");
+                    message += i++ + ". " + t + "\n";
                     break;
                 }
             }
         }
         if (i == 1) {
-            System.out.print("(No matches.) \n");
+            message += "(No matches.) \n";
         }
-        Ui.printLine();
+        message += Ui.printLine();
+        return message;
     }
 }
