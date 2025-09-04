@@ -21,6 +21,7 @@ public enum CommandType {
     EVENT("event"),
     DELETE("delete"),
     ONDATE("ondate"),
+    FIND("find"),
     UNKNOWN("");
 
     private final String keyword;

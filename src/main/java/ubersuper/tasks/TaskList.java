@@ -318,4 +318,42 @@ public class TaskList extends ArrayList<Task> {
         }
         return message;
     }
+
+    /**
+     * Finds and prints tasks whose descriptions contain any of the given keywords (case-insensitive).
+     * Usage: {@code find <keyword(s)>}
+     * Examples:
+     * <pre>
+     *   find book
+     *   find return book
+     * </pre>
+     * Matching is OR across keywords: a task is listed if its description contains at least one keyword.
+     */
+    public void find(String input) {
+        String[] parts = input.split("\\s+", 2);
+        if (parts.length < 2 || parts[1].isBlank()) {
+            throw new UberExceptions("Use: find <keyword(s)>");
+        }
+
+        // Split the query into keywords and match, case-insensitive
+        String[] keywords = parts[1].toLowerCase().split("\\s+");
+
+        Ui.printLine();
+        System.out.print("Here are the matching tasks in your list:\n");
+
+        int i = 1;
+        for (Task t: this) {
+            String lowerCaseDesc = t.desc().toLowerCase();
+            for (String k : keywords) {
+                if (!k.isBlank() && lowerCaseDesc.contains(k)) {
+                    System.out.print(i++ + ". " + t + "\n");
+                    break;
+                }
+            }
+        }
+        if (i == 1) {
+            System.out.print("(No matches.) \n");
+        }
+        Ui.printLine();
+    }
 }
