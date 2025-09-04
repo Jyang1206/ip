@@ -66,6 +66,8 @@ public class Ui {
                 return tasks.delete(input);
             case ONDATE:
                 return tasks.onDate(input);
+            case FIND:
+                return tasks.find(input);
             case UNKNOWN:
             default:
                 throw new UberExceptions("Sorry! I have no idea what you're trying to do.");
