@@ -250,17 +250,17 @@ public class TaskList extends ArrayList<Task> {
                 }
             }
             message += Ui.printLine();
-            message += "Items on " + day.format(DateTimeFormatter.ofPattern("MMM dd yyyy")) + ":";
+            message += "Items on " + day.format(DateTimeFormatter.ofPattern("MMM dd yyyy")) + ": \n";
             int i = 1;
             for (Task t : this) {
                 if (t instanceof Deadline d) {
                     if (d.isOnDate(day)) {
-                        message += i++ + ". " + this;
+                        message += i++ + ". " + t + "\n";
                     }
                 } else if (t instanceof Event ev) {
                     // consider an event "occurring on" if any part of it touches that date
                     if (ev.isOnDate(day)) {
-                        message += i++ + ". " + this;
+                        message += i++ + ". " + t + "\n";
                     }
                 }
             }
