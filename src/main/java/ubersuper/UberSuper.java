@@ -24,6 +24,9 @@ public class UberSuper {
     private final Ui ui = new Ui(taskList);
     private String commandType;
 
+    public String greet() {
+        return ui.greet(result);
+    }
 
     public String getResponse(String input) {
         try {
