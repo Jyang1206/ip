@@ -29,7 +29,7 @@ public class TaskList extends ArrayList<Task> {
     /**
      * Creates a {@code TaskList} bound to a storage backend.
      *
-     * @param dataStorage storage component used to save/load the task list (may be {@code null} in tests)
+     * @param dataStorage storage component used to save/load the task list (maybe {@code null} in tests)
      */
     public TaskList(DataStorage dataStorage) {
         this.dataStorage = dataStorage;
@@ -52,6 +52,7 @@ public class TaskList extends ArrayList<Task> {
                 throw new UberExceptions("There's no such task in the list");
             }
             Task t = this.get(i - 1);
+            assert t != null : "Task retrieved for marking should not be null";
             t.mark();
             // save after changing done status
             dataStorage.save(this);
@@ -81,6 +82,7 @@ public class TaskList extends ArrayList<Task> {
                 throw new UberExceptions("There's no such task in the list");
             }
             Task t = this.get(i - 1);
+            assert t != null : "Task retrieved for marking should not be null";
             t.unmark();
             dataStorage.save(this);
             message += Ui.printLine();
@@ -123,8 +125,9 @@ public class TaskList extends ArrayList<Task> {
      * @return String message
      */
     public String save(Task t) {
+        assert t != null : "Task passed to save() must not be null";
         String message = "";
-        dataStorage.save(this);
+
         message += String.format("You now have %d tasks in the list \n", this.size());
         message = Ui.printLine() + "Got it! I've added this task:\n" + t + "\n" + message + Ui.printLine();
         return message;
@@ -159,6 +162,7 @@ public class TaskList extends ArrayList<Task> {
                 throw new UberExceptions("Please provide a description");
             }
             LocalDateTime dl = Parser.parseWhen(p2);
+            assert dl != null : "Parsed deadline datetime should not be null";
             Deadline d = new Deadline(desc, dl);
             this.add(d);
             return this.save(d);
@@ -202,6 +206,9 @@ public class TaskList extends ArrayList<Task> {
 
             LocalDateTime startTime = Parser.parseWhen(fromPart.substring(4).trim());
             LocalDateTime endTime = Parser.parseWhen(toPart.substring(2).trim());
+
+            assert startTime != null : "Event start time should not be null";
+            assert endTime != null : "Event end time should not be null";
 
             if (endTime.isBefore(startTime)) {
                 throw new UberExceptions("End time cannot be before start time.");
@@ -253,6 +260,7 @@ public class TaskList extends ArrayList<Task> {
             message += "Items on " + day.format(DateTimeFormatter.ofPattern("MMM dd yyyy")) + ": \n";
             int i = 1;
             for (Task t : this) {
+                assert t != null : "Task in TaskList should not be null";
                 if (t instanceof Deadline d) {
                     if (d.isOnDate(day)) {
                         message += i++ + ". " + t + "\n";
@@ -344,6 +352,7 @@ public class TaskList extends ArrayList<Task> {
 
         int i = 1;
         for (Task t: this) {
+            assert t != null : "Tasks in TaskList should not be null";
             String lowerCaseDesc = t.desc().toLowerCase();
             for (String k : keywords) {
                 if (!k.isBlank() && lowerCaseDesc.contains(k)) {

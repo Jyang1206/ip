@@ -31,6 +31,7 @@ public class Ui {
      * @param tasks the task list to operate on when handling commands
      */
     public Ui(TaskList tasks) {
+        assert tasks != null : "Ui must be created with a non-null TaskList";
         this.tasks = tasks;
     }
     /**
@@ -46,6 +47,8 @@ public class Ui {
     public String echo(String raw) {
         String input = raw.trim();
         CommandType command = Parser.fromInput(input);
+        assert command != null : "Parser must return a valid CommandType";
+
         try {
             switch (command) {
             case BYE:
@@ -91,7 +94,7 @@ public class Ui {
      * <p>
      * Typically invoked when the {@code bye} command is received.
      *
-     * @return
+     * @return String message
      */
     public String goodBye() {
         return "Bye. Hope to see you again soon! \n" + printLine();
