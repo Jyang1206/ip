@@ -10,6 +10,10 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Objects;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 /**
  * Mutable list of {@link Task} items plus high-level operations used by the UI.
@@ -238,7 +242,6 @@ public class TaskList extends ArrayList<Task> {
      * @throws UberExceptions if the date cannot be parsed
      */
     public String onDate(String input) {
-        String message = "";
         try {
             String[] parts = input.split("\\s+", 2);
             if (parts.length < 2) {
@@ -256,46 +259,48 @@ public class TaskList extends ArrayList<Task> {
                     throw new UberExceptions("Use: onDate <yyyy-mm-dd | dd/MM/yyyy>");
                 }
             }
-            message += Ui.printLine();
-            message += "Items on " + day.format(DateTimeFormatter.ofPattern("MMM dd yyyy")) + ": \n";
-            int i = 1;
-            for (Task t : this) {
-                assert t != null : "Task in TaskList should not be null";
-                if (t instanceof Deadline d) {
-                    if (d.isOnDate(day)) {
-                        message += i++ + ". " + t + "\n";
-                    }
-                } else if (t instanceof Event ev) {
-                    // consider an event "occurring on" if any part of it touches that date
-                    if (ev.isOnDate(day)) {
-                        message += i++ + ". " + t + "\n";
-                    }
-                }
+
+            LocalDate finalDay = day;
+            String results = IntStream.range(0, this.size())
+                    .mapToObj(i -> {
+                        Task t = this.get(i);
+                        assert t != null : "Task in TaskList should not be null";
+                        if (t instanceof Deadline d) {
+                            if (d.isOnDate(finalDay)) {
+                                return ++i + ". " + t;
+                            }
+                        } else if (t instanceof Event ev) {
+                            // consider an event "occurring on" if any part of it touches that date
+                            if (ev.isOnDate(finalDay)) {
+                                return ++i + ". " + t;
+                            }
+                        }
+                        return null;
+                    })
+                    .filter(Objects::nonNull)
+                    .collect(Collectors.joining("\n"));
+
+            if (results.isBlank()) {
+                results = "(No items.)";
             }
-            if (i == 1) {
-                message += "(No items.)";
-            }
-            message += Ui.printLine();
+            return "Items on " + day.format(DateTimeFormatter.ofPattern("MMM dd yyyy")) + ": \n"
+                    + results;
+
         } catch (UberExceptions e) {
             return Ui.printLine() + e.getMessage() + "\n" + Ui.printLine();
         }
-        return message;
     }
 
     /**
      * Returns a String of all tasks with their 1-based indices.
      */
     public String list() {
-        String message = "";
-        message += Ui.printLine();
-        int listNum = 1;
-        message += "Here are the tasks in your list:\n";
-        for (Task task : this) {
-            message += listNum + ". " + task + "\n";
-            listNum++;
-        }
-        message += Ui.printLine();
-        return message;
+        String tasks = IntStream.range(0, this.size())
+                .mapToObj(i -> (i + 1) + ". " + this.get(i))
+                .collect(Collectors.joining("\n"));
+
+        return "Here are the tasks in your list:\n"
+                + tasks + "\n";
     }
 
     /**
@@ -340,7 +345,6 @@ public class TaskList extends ArrayList<Task> {
      * Matching is OR across keywords: a task is listed if its description contains at least one keyword.
      */
     public String find(String input) {
-        String message = "";
         String[] parts = input.split("\\s+", 2);
         if (parts.length < 2 || parts[1].isBlank()) {
             throw new UberExceptions("Use: find <keyword(s)>");
@@ -349,23 +353,23 @@ public class TaskList extends ArrayList<Task> {
         // Split the query into keywords and match, case-insensitive
         String[] keywords = parts[1].toLowerCase().split("\\s+");
 
-        message += Ui.printLine() + "Here are the matching tasks in your list:\n";
+        String matches = IntStream.range(0, this.size())
+                .mapToObj(i -> {
+                    Task t = this.get(i);
+                    assert t != null : "Task in TaskList should not be null";
+                    String desc = t.desc().toLowerCase();
+                    boolean found = Arrays.stream(keywords)
+                            .filter(k -> !k.isBlank())
+                            .anyMatch(desc::contains);
+                    return found ? (i + 1) + ". " + t : null;
+                })
+                .filter(Objects::nonNull)
+                .collect(Collectors.joining("\n"));
 
-        int i = 1;
-        for (Task t : this) {
-            assert t != null : "Tasks in TaskList should not be null";
-            String lowerCaseDesc = t.desc().toLowerCase();
-            for (String k : keywords) {
-                if (!k.isBlank() && lowerCaseDesc.contains(k)) {
-                    message += i++ + ". " + t + "\n";
-                    break;
-                }
-            }
+        if (matches.isBlank()) {
+            matches = "(No matches.)";
         }
-        if (i == 1) {
-            message += "(No matches.) \n";
-        }
-        message += Ui.printLine();
-        return message;
+        return "Here are the matching tasks in your list: \n"
+                + matches;
     }
 }

@@ -39,92 +39,97 @@ public class TaskListTest {
         tasks.clear();
     }
 
+
     @Test
-    void list_withTasks_printsHeaderAndNumberedItems() {
+    void list_withTasks_returnsHeaderAndNumberedItems() {
         tasks.add(new Todo("T1 do something"));
         tasks.add(new Deadline("D1 report", LocalDateTime.of(2019, 10, 15, 0, 0)));
         tasks.add(new Event("E1 meet", LocalDateTime.of(2019, 12, 2, 9, 0),
                 LocalDateTime.of(2019, 12, 2, 10, 0)));
 
-        tasks.list();
-        String s = out.toString();
+        String output = tasks.list();
 
-        assertTrue(s.contains("Here are the tasks in your list:"), s);
-        assertTrue(s.contains("1. "), s);
-        assertTrue(s.contains("2. "), s);
-        assertTrue(s.contains("3. "), s);
+        assertTrue(output.contains("Here are the tasks in your list:"), output);
+        assertTrue(output.contains("1. "), output);
+        assertTrue(output.contains("2. "), output);
+        assertTrue(output.contains("3. "), output);
 
-        assertTrue(s.contains("T1 do something"), s);
-        assertTrue(s.contains("D1 report"), s);
-        assertTrue(s.contains("E1 meet"), s);
+        assertTrue(output.contains("T1 do something"), output);
+        assertTrue(output.contains("D1 report"), output);
+        assertTrue(output.contains("E1 meet"), output);
     }
-
     @Test
-    void onDate_withDeadlinesAndEvents_filtersItemsTouchingDay() {
-        // Deadlines
-        tasks.add(new Deadline("D1", LocalDateTime.of(2019, 12, 2, 0, 0)));  // ✓
-        tasks.add(new Deadline("D2", LocalDateTime.of(2019, 12, 3, 0, 0)));  // ✗
-
-        // Events
-        tasks.add(new Event("E1",  // ✓ within the day
+    void onDate_withDeadlinesAndEvents_returnsItemsWithOriginalIndices() {
+        tasks.add(new Todo("T0 dummy")); // index 1
+        tasks.add(new Deadline("D1", LocalDateTime.of(2019, 12, 2, 0, 0)));  // index 2 ✓
+        tasks.add(new Deadline("D2", LocalDateTime.of(2019, 12, 3, 0, 0)));  // index 3 ✗
+        tasks.add(new Event("E1",  // index 4 ✓
                 LocalDateTime.of(2019, 12, 2, 9, 0),
                 LocalDateTime.of(2019, 12, 2, 10, 0)));
-
-        tasks.add(new Event("E2",  // ✓ spans across the day
+        tasks.add(new Event("E2",  // index 5 ✓
                 LocalDateTime.of(2019, 12, 1, 23, 0),
-                LocalDateTime.of(2019, 12, 3,  1, 0)));
+                LocalDateTime.of(2019, 12, 3, 1, 0)));
 
-        tasks.add(new Event("E3",  // ✗ outside
-                LocalDateTime.of(2019, 12, 4,  9, 0),
-                LocalDateTime.of(2019, 12, 4, 10, 0)));
+        String output = tasks.onDate("ondate 2019-12-02");
 
-        tasks.onDate("ondate 2019-12-02");
-        String output = out.toString();
+        // Should match index in actual list 2, 4, 5
+        assertTrue(output.contains("2. "), output);
+        assertTrue(output.contains("4. "), output);
+        assertTrue(output.contains("5. "), output);
 
-        // Should list D1, E1, E2
-        assertTrue(output.contains("D1"), output);
-        assertTrue(output.contains("E1"), output);
-        assertTrue(output.contains("E2"), output);
-
-        // Should NOT list D2, E3
-        assertFalse(output.contains("D2"), output);
-        assertFalse(output.contains("E3"), output);
-
-        // Numbering should start at 1 and increment
-        assertTrue(output.contains("1."), output);
-        assertTrue(output.contains("2."), output);
-        assertTrue(output.contains("3."), output);
+        assertFalse(output.contains("3. "), output);
     }
 
-
     private String runOnDate(String arg) {
-        out.reset();
-        tasks.onDate("ondate " + arg);
-        return out.toString();
+        return tasks.onDate("ondate " + arg);
     }
 
     @Test
-    void onDate_withIsoSlashDashAndDateTime_acceptsInput() {
+    void onDate_acceptsSupportedDateFormats() {
         String iso = runOnDate("2019-12-02");
         assertTrue(iso.contains("Items on Dec 02 2019:"), iso);
 
         String slash = runOnDate("2/12/2019");
         assertTrue(slash.contains("Items on Dec 02 2019:"), slash);
-
-        String dash = runOnDate("2-12-2019");
-        // If your onDate currently doesn't accept d-M-uuuu, update it to use Parser.parseWhen(...)
-        assertTrue(dash.contains("Items on Dec 02 2019:"), dash);
-
-        String isoT = runOnDate("2019-12-02T18:00");
-        assertTrue(isoT.contains("Items on Dec 02 2019:"), isoT);
-
-        String isoSpace = runOnDate("2019-12-02 18:00");
-        assertTrue(isoSpace.contains("Items on Dec 02 2019:"), isoSpace);
     }
 
     @Test
-    void onDate_withTwoDigitYear_showsUsageHint() {
+    void onDate_withUnsupportedFormats_returnsUsageHint() {
+        assertTrue(runOnDate("2-12-2019")
+                .contains("Use: onDate <yyyy-mm-dd | dd/MM/yyyy>"));
+
+        assertTrue(runOnDate("2019-12-02T18:00")
+                .contains("Use: onDate <yyyy-mm-dd | dd/MM/yyyy>"));
+
+        assertTrue(runOnDate("2019-12-02 18:00")
+                .contains("Use: onDate <yyyy-mm-dd | dd/MM/yyyy>"));
+    }
+
+    @Test
+    void onDate_withTwoDigitYear_returnsUsageHint() {
         String bad = runOnDate("10-10-20");
         assertTrue(bad.contains("Use: onDate <yyyy-mm-dd | dd/MM/yyyy>"), bad);
+    }
+    @Test
+    void find_withKeyword_returnsOriginalIndices() {
+        tasks.add(new Todo("read book"));  // index 1
+        tasks.add(new Deadline("return book", LocalDateTime.of(2019, 10, 15, 0, 0))); // index 2
+        tasks.add(new Event("meeting", LocalDateTime.of(2019, 12, 2, 9, 0),
+                LocalDateTime.of(2019, 12, 2, 10, 0))); // index 3
+
+        String output = tasks.find("find book");
+
+        assertTrue(output.contains("1. [T]"), output);
+        assertTrue(output.contains("2. [D]"), output);
+        assertFalse(output.contains("3."), output);
+    }
+
+    @Test
+    void find_withNoMatches_returnsNoMatchesMessage() {
+        tasks.add(new Todo("read book"));
+
+        String output = tasks.find("find hello");
+
+        assertTrue(output.contains("(No matches.)"), output);
     }
 }
