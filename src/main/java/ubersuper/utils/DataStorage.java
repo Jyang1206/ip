@@ -1,5 +1,7 @@
 package ubersuper.utils;
 
+import ubersuper.tasks.*;
+
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -7,15 +9,9 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeParseException;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
-
-import ubersuper.tasks.Deadline;
-import ubersuper.tasks.Event;
-import ubersuper.tasks.Task;
-import ubersuper.tasks.TaskList;
-import ubersuper.tasks.Todo;
 
 
 /**
@@ -64,16 +60,8 @@ public class DataStorage {
      * </ul>
      *
      * @return a {@link LoadedResult} containing the populated {@link TaskList}, number of tasks loaded,
-     *      and number of lines skipped.
-     * */
-    @SuppressWarnings({"checkstyle:Indentation",
-        "checkstyle:LeftCurly",
-                       "checkstyle:NeedBraces",
-                       "checkstyle:SingleSpaceSeparator",
-                       "checkstyle:OneStatementPerLine",
-                       "checkstyle:WhitespaceAround",
-                       "checkstyle:LineLength",
-                       "checkstyle:JavadocTagContinuationIndentation"})
+     * and number of lines skipped.
+     **/
     public LoadedResult load() {
         TaskList tasks = new TaskList(this);
         int skipped = 0;
@@ -86,79 +74,76 @@ public class DataStorage {
                 return new LoadedResult(tasks, 0, 0);
             }
             List<String> lines = Files.readAllLines(dataPath, StandardCharsets.UTF_8);
-            for (String data : lines) {
-                String line = data.trim();
-                if (line.isEmpty()) {
-                    continue;
-                }
-                String[] parts = line.split("\\|");
-                for (int i = 0; i < parts.length; i++) {
-                    parts[i] = parts[i].trim();
-                }
+            // parse each line -> Task or null
+            List<Task> parsedTasks = lines.stream()
+                    .map(String::trim)
+                    .filter(line -> !line.isEmpty())
+                    .map(line -> {
+                        try {
+                            String[] parts = line.split("\\|");
+                            for (int i = 0; i < parts.length; i++) {
+                                parts[i] = parts[i].trim();
+                            }
 
-                try {
-                    // incomplete prompt
-                    if (parts.length < 3) {
-                        skipped++;
-                        continue;
-                    }
-                    String type = parts[0];
-                    int done = Integer.parseInt(parts[1]);
-                    String description = parts[2];
-                    switch (type) {
-                    case "T": {
-                        Todo t = new Todo(description);
-                        if (done == 1) {
-                            t.mark();
-                        }
-                        tasks.add(t);
-                        break;
-                    }
-                    case "D": {
-                        // incomplete prompt
-                        if (parts.length < 4) {
-                            skipped++;
-                            break;
-                        }
-                        try {
-                            LocalDateTime deadline = LocalDateTime.parse(parts[3]);
-                            Deadline d = new Deadline(description, deadline);
-                            if (done == 1) {
-                                d.mark();
+                            if (parts.length < 3) {
+                                return null;
                             }
-                            tasks.add(d);
-                        } catch (DateTimeParseException e) {
-                            skipped++;
-                        }
-                        break;
-                    }
-                    case "E": {
-                        if (parts.length < 5) {
-                            skipped++;
-                            break;
-                        }
-                        try {
-                            LocalDateTime start = LocalDateTime.parse(parts[3]);
-                            LocalDateTime end = LocalDateTime.parse(parts[4]);
-                            Event e = new Event(description, start, end);
-                            if (done == 1) {
-                                e.mark();
+
+                            String type = parts[0];
+                            int done = Integer.parseInt(parts[1]);
+                            String description = parts[2];
+
+                            switch (type) {
+                            case "T" -> {
+                                Todo t = new Todo(description);
+                                if (done == 1) {
+                                    t.mark();
+                                }
+                                return t;
                             }
-                            tasks.add(e);
-                        } catch (DateTimeParseException ex) {
-                            skipped++;
+                            case "D" -> {
+                                if (parts.length < 4) {
+                                    return null;
+                                }
+                                LocalDateTime deadline = LocalDateTime.parse(parts[3]);
+                                Deadline d = new Deadline(description, deadline);
+                                if (done == 1) {
+                                    d.mark();
+                                }
+                                return d;
+                            }
+                            case "E" -> {
+                                if (parts.length < 5) {
+                                    return null;
+                                }
+                                LocalDateTime start = LocalDateTime.parse(parts[3]);
+                                LocalDateTime end = LocalDateTime.parse(parts[4]);
+                                Event e = new Event(description, start, end);
+                                if (done == 1) {
+                                    e.mark();
+                                }
+                                return e;
+                            }
+                            default -> {
+                                return null;
+                            }
+                            }
+                        } catch (Exception e) {
+                            return null;
                         }
-                        break;
-                    }
-                    default:
-                        // task not labelled correctly
-                        skipped++;
-                    }
-                } catch (Exception e) {
-                    skipped++;
-                }
-            }
+                    })
+                    .toList();
+
+            // add valid tasks to TaskList
+            parsedTasks.stream()
+                    .filter(Objects::nonNull)
+                    .forEach(tasks::add);
+
+            // count skipped lines
+            skipped = (int) parsedTasks.stream().filter(Objects::isNull).count();
+
             return new LoadedResult(tasks, tasks.size(), skipped);
+
         } catch (IOException ioe) {
             return new LoadedResult(tasks, 0, 0);
         }
