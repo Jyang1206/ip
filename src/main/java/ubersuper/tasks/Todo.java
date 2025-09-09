@@ -34,7 +34,7 @@ public class Todo extends Task {
      * @return pipe-separated single-line representation for persistence
      */
     @Override
-    public String formattedString() {
+    public String formatString() {
         return String.format("%s | %d | %s",
                 type().getSymbol(),
                 isDone() ? 1 : 0,

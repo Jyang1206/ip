@@ -168,7 +168,7 @@ public class DataStorage {
      * Saves the current {@link TaskList} to disk, overwriting the previous content.
      * <ul>
      *   <li>Ensures the {@code data/} directory exists.</li>
-     *   <li>Serializes each task via {@link Task#formattedString()}.</li>
+     *   <li>Serializes each task via {@link Task#formatString()}.</li>
      *   <li>Writes using UTF-8; truncates the file first.</li>
      * </ul>
      *
@@ -180,7 +180,7 @@ public class DataStorage {
             if (Files.notExists(dataPath.getParent())) {
                 Files.createDirectories(dataPath.getParent());
             }
-            List<String> lines = tasks.stream().map(Task::formattedString).collect(Collectors.toList());
+            List<String> lines = tasks.stream().map(Task::formatString).collect(Collectors.toList());
             Files.write(dataPath,
                     lines,
                     StandardCharsets.UTF_8,

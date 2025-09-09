@@ -327,6 +327,7 @@ public class TaskList extends ArrayList<Task> {
      *   find book
      *   find return book
      * </pre>
+     *
      * @return String message
      * Matching is OR across keywords: a task is listed if its description contains at least one keyword.
      */
@@ -343,7 +344,7 @@ public class TaskList extends ArrayList<Task> {
         message += Ui.printLine() + "Here are the matching tasks in your list:\n";
 
         int i = 1;
-        for (Task t: this) {
+        for (Task t : this) {
             String lowerCaseDesc = t.desc().toLowerCase();
             for (String k : keywords) {
                 if (!k.isBlank() && lowerCaseDesc.contains(k)) {
