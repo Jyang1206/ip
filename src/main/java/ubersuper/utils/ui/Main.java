@@ -24,9 +24,12 @@ public class Main extends Application {
             stage.setMinWidth(417);
             FXMLLoader fxmlLoader = new FXMLLoader(Main.class.getResource("/view/MainWindow.fxml"));
             AnchorPane ap = fxmlLoader.load();
+            assert ap != null : "MainWindow.fxml should load an AnchorPane";
             Scene scene = new Scene(ap);
             stage.setScene(scene);
-            fxmlLoader.<MainWindow>getController().setUberSuper(uberSuper); //inject the UberSuper instance
+            MainWindow controller = fxmlLoader.<MainWindow>getController();
+            assert controller != null : "MainWindow.fxml should have a valid controller";
+            controller.setUberSuper(uberSuper); //inject the UberSuper instance
             stage.show();
         } catch (IOException e) {
             e.printStackTrace();
