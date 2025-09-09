@@ -8,7 +8,7 @@ import java.time.LocalDateTime;
  * <p>
  * The deadline is stored as a {@link LocalDateTime} and is printed in a
  * user-friendly format by {@link #toString()} while stored in {@link ubersuper.utils.DataStorage} in an
- * ISO-local date-time format by {@link #formattedString()}.
+ * ISO-local date-time format by {@link #formatString()}.
  */
 public class Deadline extends Task {
     private final LocalDateTime deadLine;
@@ -58,7 +58,7 @@ public class Deadline extends Task {
      * @return pipe-separated single-line representation
      */
     @Override
-    public String formattedString() {
+    public String formatString() {
         return String.format("%s | %d | %s | %s",
                 type().getSymbol(),
                 isDone() ? 1 : 0,

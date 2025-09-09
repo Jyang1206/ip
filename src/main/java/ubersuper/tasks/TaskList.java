@@ -127,7 +127,7 @@ public class TaskList extends ArrayList<Task> {
     public String save(Task t) {
         assert t != null : "Task passed to save() must not be null";
         String message = "";
-
+        dataStorage.save(this);
         message += String.format("You now have %d tasks in the list \n", this.size());
         message = Ui.printLine() + "Got it! I've added this task:\n" + t + "\n" + message + Ui.printLine();
         return message;
@@ -335,6 +335,7 @@ public class TaskList extends ArrayList<Task> {
      *   find book
      *   find return book
      * </pre>
+     *
      * @return String message
      * Matching is OR across keywords: a task is listed if its description contains at least one keyword.
      */
@@ -351,7 +352,7 @@ public class TaskList extends ArrayList<Task> {
         message += Ui.printLine() + "Here are the matching tasks in your list:\n";
 
         int i = 1;
-        for (Task t: this) {
+        for (Task t : this) {
             assert t != null : "Tasks in TaskList should not be null";
             String lowerCaseDesc = t.desc().toLowerCase();
             for (String k : keywords) {

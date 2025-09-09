@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
  * The startTime and endTime is stored as a {@link LocalDateTime} and is printed in a
  * user-friendly display format (date-only if time is midnight) by {@link #toString()}
  * while stored in {@link ubersuper.utils.DataStorage} in an ISO-local date-time format
- * by {@link #formattedString()}.,
+ * by {@link #formatString()}.,
  */
 public class Event extends Task {
     private final LocalDateTime startTime;
@@ -64,7 +64,7 @@ public class Event extends Task {
      * @return pipe-separated single-line representation for persistence
      */
     @Override
-    public String formattedString() {
+    public String formatString() {
         return String.format("%s | %d | %s | %s | %s",
                 type().getSymbol(), isDone() ? 1 : 0,
                 desc(),

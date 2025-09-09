@@ -13,7 +13,7 @@ import java.time.format.DateTimeFormatter;
  * provides common formatting helpers for printing and persistence.
  * Subclasses must provide:
  * <ul>
- *   <li>{@link #formattedString()} — a single-line pipe-separated form for storage</li>
+ *   <li>{@link #formatString()} — a single-line pipe-separated form for storage</li>
  *   <li>{@link #isOnDate(LocalDate)} — logic to decide if/what to print when filtering by date</li>
  * </ul>
  */
@@ -44,11 +44,23 @@ public abstract class Task {
     private final TaskType type;
 
     /**
+     * Creates a task with the given description and type.
+     *
+     * @param description user-visible description of the task
+     * @param type        task category tag
+     */
+    public Task(String description, TaskType type) {
+        this.description = description;
+        this.type = type;
+
+    }
+
+    /**
      * Returns the single-line, pipe-separated representation of this task.
      *
      * @return storage-friendly string
      */
-    abstract public String formattedString();
+    public abstract String formatString();
 
     /**
      * Prints this task when filtering by a given day, if it matches the subclass' criteria.
@@ -63,20 +75,7 @@ public abstract class Task {
      * @param day date being queried
      * @return {@code true} if printed; {@code false} otherwise
      */
-    abstract public boolean isOnDate(LocalDate day);
-
-    /**
-     * Creates a task with the given description and type.
-     *
-     * @param description user-visible description of the task
-     * @param type        task category tag
-     */
-    public Task(String description, TaskType type) {
-        this.description = description;
-        this.type = type;
-
-    }
-
+    public abstract boolean isOnDate(LocalDate day);
 
     public void mark() {
         this.isDone = true;
