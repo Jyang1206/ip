@@ -1,7 +1,9 @@
 package ubersuper.utils;
 
+import ubersuper.clients.Client;
 import ubersuper.exceptions.UberExceptions;
 import ubersuper.utils.command.CommandType;
+import ubersuper.utils.ui.Ui;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -56,8 +58,8 @@ public class Parser {
         if (input == null || input.isBlank()) {
             return CommandType.UNKNOWN;
         }
-
-        String head = input.strip().split("\\s+", 2)[0].toLowerCase();
+        String[] parts = input.strip().split("\\s+", 2);
+        String head = parts[0].toLowerCase();
 
         for (CommandType c : CommandType.values()) {
             if (head.equals(c.getKeyword())) {
@@ -78,7 +80,7 @@ public class Parser {
      * @return a {@link LocalDateTime} representing the parsed moment
      * @throws UberExceptions if the input cannot be parsed by any supported format
      */
-    public static LocalDateTime parseWhen(String raw) throws UberExceptions {
+    public static LocalDateTime parseDateTime(String raw) throws UberExceptions {
         String s = raw.trim();
 
         // 1) ISO date-time: 2019-12-02T18:00 (or "2019-12-02 18:00")
@@ -138,4 +140,35 @@ public class Parser {
     }
 
 
+    /**
+     * Parses a string into a string of client details
+     * <p>
+     *
+     * @param raw user input containing a date/time
+     * @return a string representing the client's details
+     * @throws UberExceptions if the input cannot be parsed by any supported format
+     */
+    public static Client parseAddClient(String raw) throws UberExceptions{
+            String[] parts = raw.split("/");
+            if (parts.length < 2) {
+                throw new UberExceptions("Use format: addclient <name> /phone <phone number> /email <email address>");
+            } else if (parts.length < 3) {
+                throw new UberExceptions("Use format: addclient <name> /phone <phone number> /email <email address>");
+            }
+
+            String name = parts[0].replaceFirst("addclient", "");
+            String phonePart = parts[1].trim(); // "phone ..."
+            String emailPart = parts[2].trim(); // "email ..."
+            if (name.isEmpty()) {
+                throw new UberExceptions("Please give your client a name");
+            }
+            //ensure correct formatting
+            if (!phonePart.toLowerCase().startsWith("phone") || !emailPart.toLowerCase().startsWith("email")) {
+                throw new UberExceptions("Use format: addclient <name> /phone <phone number> /email <email address>");
+            }
+            String phone = phonePart.replaceFirst("phone", "").trim();
+            String email = emailPart.replaceFirst("email", "").trim();
+
+            return new Client(name, phone, email);
+    }
 }
