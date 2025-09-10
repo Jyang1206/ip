@@ -1,6 +1,5 @@
 package ubersuper.utils.ui;
 
-import ubersuper.clients.Client;
 import ubersuper.clients.ClientList;
 import ubersuper.exceptions.UberExceptions;
 import ubersuper.tasks.TaskList;
@@ -56,7 +55,7 @@ public class Ui {
             switch (command) {
             case BYE:
                 return goodBye();
-            case LIST:
+            case TASKLIST:
                 return tasks.list();
             case MARK:
                 return tasks.mark(input);
@@ -68,12 +67,20 @@ public class Ui {
                 return tasks.deadline(input);
             case EVENT:
                 return tasks.event(input);
-            case DELETE:
+            case DELETETASK:
                 return tasks.delete(input);
             case ONDATE:
                 return tasks.onDate(input);
-            case FIND:
+            case FINDTASK:
                 return tasks.find(input);
+            case FINDCLIENT:
+                return clients.find(input);
+            case DELETECLIENT:
+                return clients.delete(input);
+            case CLIENTLIST:
+                return clients.list();
+            case ADDCLIENT:
+                return clients.add(input);
             case UNKNOWN:
             default:
                 throw new UberExceptions("Sorry! I have no idea what you're trying to do.");

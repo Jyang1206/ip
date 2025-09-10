@@ -2,6 +2,7 @@ package ubersuper.clients;
 
 import ubersuper.exceptions.UberExceptions;
 import ubersuper.tasks.Task;
+import ubersuper.utils.Parser;
 import ubersuper.utils.storage.ClientStorage;
 import ubersuper.utils.storage.DataStorage;
 import ubersuper.utils.ui.Ui;
@@ -42,7 +43,7 @@ public class ClientList extends ArrayList<Client> {
         String message = "";
         clientStorage.save(this);
         message += String.format("You now have %d clients in the list \n", this.size());
-        message = Ui.printLine() + "Got it! I've added this client:\n" + c + "\n" + message + Ui.printLine();
+        message = "Got it! I've added this client:\n" + c + "\n" + message + Ui.printLine();
         return message;
     }
 
@@ -103,7 +104,7 @@ public class ClientList extends ArrayList<Client> {
     public String find(String input) {
         String[] parts = input.split("\\s+", 2);
         if (parts.length < 2 || parts[1].isBlank()) {
-            throw new UberExceptions("Use: find <keyword(s)>");
+            throw new UberExceptions("Use: find client <name>");
         }
 
         // Split the query into keywords and match, case-insensitive
@@ -111,13 +112,13 @@ public class ClientList extends ArrayList<Client> {
 
         String matches = IntStream.range(0, this.size())
                 .mapToObj(i -> {
-                    Client t = this.get(i);
-                    assert t != null : "Task in TaskList should not be null";
-                    String name = t.getName().toLowerCase();
+                    Client c = this.get(i);
+                    assert c != null : "Client in ClientList should not be null";
+                    String name = c.getName().toLowerCase();
                     boolean found = Arrays.stream(keywords)
                             .filter(k -> !k.isBlank())
                             .anyMatch(name::contains);
-                    return found ? (i + 1) + ". " + t : null;
+                    return found ? (i + 1) + ". " + c : null;
                 })
                 .filter(Objects::nonNull)
                 .collect(Collectors.joining("\n"));
@@ -125,7 +126,7 @@ public class ClientList extends ArrayList<Client> {
         if (matches.isBlank()) {
             matches = "(No matches.)";
         }
-        return "Here are the matching clients in your list: \n"
+        return String.format("Here are the clients %s in your list: \n", parts[1])
                 + matches;
     }
     /**
@@ -141,5 +142,21 @@ public class ClientList extends ArrayList<Client> {
         message += String.format("You now have %d clients in the list \n", this.size());
         message = Ui.printLine() + "Got it! I've added this task:\n" + t + "\n" + message + Ui.printLine();
         return message;
+    }
+
+    /**
+     * Adds the client to the current list and saves the client in {@link ClientStorage}.
+     *
+     * @param input task that was just added
+     * @return String message
+     */
+    public String add(String input) {
+        try {
+            Client c = Parser.parseAddClient(input);
+            this.add(c);
+            return this.save(c);
+        } catch (UberExceptions e) {
+        return Ui.printLine() + e.getMessage() + "\n" + Ui.printLine();
+        }
     }
 }

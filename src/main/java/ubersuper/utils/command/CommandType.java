@@ -1,11 +1,6 @@
 package ubersuper.utils.command;
 
 
-import ubersuper.exceptions.UberExceptions;
-import ubersuper.tasks.TaskList;
-import ubersuper.utils.Parser;
-import ubersuper.utils.ui.Ui;
-
 /**
  * Top-level commands supported by the UberSuper CLI.
  * <p>
@@ -13,15 +8,19 @@ import ubersuper.utils.ui.Ui;
  */
 public enum CommandType {
     BYE("bye"),
-    LIST("list"),
+    TASKLIST("listtask"),
+    CLIENTLIST("listclient"),
     MARK("mark"),
     UNMARK("unmark"),
     TODO("todo"),
     DEADLINE("deadline"),
     EVENT("event"),
-    DELETE("delete"),
+    DELETETASK("deletetask"),
+    DELETECLIENT("deleteclient"),
     ONDATE("ondate"),
-    FIND("find"),
+    FINDTASK("findtask"),
+    FINDCLIENT("findclient"),
+    ADDCLIENT("addclient"),
     UNKNOWN("");
 
     private final String keyword;

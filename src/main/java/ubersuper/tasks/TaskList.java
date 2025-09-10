@@ -142,7 +142,7 @@ public class TaskList extends ArrayList<Task> {
      * Adds a {@link Deadline} parsed from user input, saves the list, and prints a confirmation.
      * <p>Expected format: {@code "deadline <desc> /by <when>"}.</p>
      * <p>
-     * Supported {@code <when>} formats are delegated to {@link Parser#parseWhen(String)} and include:
+     * Supported {@code <when>} formats are delegated to {@link Parser#parseDateTime(String)} and include:
      * {@code yyyy-MM-dd}, {@code yyyy-MM-dd HH:mm}, {@code yyyy-MM-dd'T'HH:mm}, {@code d/M/uuuu [HHmm]},
      * {@code d-M-uuuu [HHmm]}.
      * </p>
@@ -166,7 +166,7 @@ public class TaskList extends ArrayList<Task> {
             if (desc.isEmpty()) {
                 throw new UberExceptions("Please provide a description");
             }
-            LocalDateTime dl = Parser.parseWhen(p2);
+            LocalDateTime dl = Parser.parseDateTime(p2);
             assert dl != null : "Parsed deadline datetime should not be null";
             Deadline d = new Deadline(desc, dl);
             this.add(d);
@@ -180,7 +180,7 @@ public class TaskList extends ArrayList<Task> {
      * Adds an {@link Event} parsed from user input, saves the list, and prints a confirmation.
      * <p>Expected format: {@code "event <desc> /from <start> /to <end>"}.</p>
      * <p>
-     * Date-time parsing is delegated to {@link Parser#parseWhen(String)} and supports the same formats
+     * Date-time parsing is delegated to {@link Parser#parseDateTime(String)} and supports the same formats
      * as {@link #deadline(String)}. The end time must not be before the start time.
      * </p>
      *
@@ -209,8 +209,8 @@ public class TaskList extends ArrayList<Task> {
                 throw new UberExceptions("Use format: event <desc> /from <start> /to <end>");
             }
 
-            LocalDateTime startTime = Parser.parseWhen(fromPart.substring(4).trim());
-            LocalDateTime endTime = Parser.parseWhen(toPart.substring(2).trim());
+            LocalDateTime startTime = Parser.parseDateTime(fromPart.substring(4).trim());
+            LocalDateTime endTime = Parser.parseDateTime(toPart.substring(2).trim());
 
             assert startTime != null : "Event start time should not be null";
             assert endTime != null : "Event end time should not be null";
@@ -335,7 +335,7 @@ public class TaskList extends ArrayList<Task> {
 
     /**
      * Finds and prints tasks whose descriptions contain any of the given keywords (case-insensitive).
-     * Usage: {@code find <keyword(s)>}
+     * Usage: {@code find task <keyword(s)>}
      * Examples:
      * <pre>
      *   find book
@@ -348,7 +348,7 @@ public class TaskList extends ArrayList<Task> {
     public String find(String input) {
         String[] parts = input.split("\\s+", 2);
         if (parts.length < 2 || parts[1].isBlank()) {
-            throw new UberExceptions("Use: find <keyword(s)>");
+            throw new UberExceptions("Use: findtask <keyword(s)>");
         }
 
         // Split the query into keywords and match, case-insensitive
