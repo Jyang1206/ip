@@ -26,11 +26,11 @@ public class UberSuper {
     private final LoadedResult<ClientList> clientsResult = clientStorage.load();
     private final TaskList taskList = tasksResult.list();
     private final ClientList clientList = clientsResult.list();
-    private final Ui ui = new Ui(taskList);
+    private final Ui ui = new Ui(taskList, clientList);
     private String commandType;
 
     public String greet() {
-        return ui.greet(result);
+        return ui.greet(tasksResult,clientsResult);
     }
 
     public String getResponse(String input) {

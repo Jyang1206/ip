@@ -1,5 +1,7 @@
 package ubersuper.utils.ui;
 
+import ubersuper.clients.Client;
+import ubersuper.clients.ClientList;
 import ubersuper.exceptions.UberExceptions;
 import ubersuper.tasks.TaskList;
 import ubersuper.utils.LoadedResult;
@@ -24,13 +26,16 @@ public class Ui {
     private static final String BOT_NAME = "UberSuper";
     private static final String LINE = "_________________________________";
     private final TaskList tasks;
+    private final ClientList clients;
 
     /**
      * @param tasks the task list to operate on when handling commands
      */
-    public Ui(TaskList tasks) {
+    public Ui(TaskList tasks , ClientList clients) {
         assert tasks != null : "Ui must be created with a non-null TaskList";
         this.tasks = tasks;
+        assert clients != null : "Ui must be created with a non-null ClientList";
+        this.clients = clients;
     }
     /**
      * Runs the main command loop.
@@ -100,32 +105,45 @@ public class Ui {
 
 
     /**
-     * Prints the initial greeting and, if applicable, a summary of the load results.
+     * Prints the initial greeting and, if applicable, a summary of the load tasksResults.
      * <p>
      * When prior tasks are found on disk, shows how many were loaded and how many
      * lines were skipped due to errors, then prints the current list of tasks.
      * Otherwise, informs the user that the list is empty.
      *
-     * @param result the outcome of loading tasks from disk
+     * @param tasksResult the outcome of loading tasks from disk
+     * @param clientsResult the outcome of loading clients from disk
      */
-    public String greet(LoadedResult result) {
+    public String greet(LoadedResult<TaskList> tasksResult, LoadedResult<ClientList> clientsResult) {
         String message = "";
-        // show result if available, if not, do standard greeting
-        message += printLine() + " Hello! I'm " + BOT_NAME + "\n" + " What can I do for you?" + "\n";
-        if (result.taskSize() > 0 || result.skipped() > 0) {
-            message += printLine();
+        // show tasksResult if available, if not, do standard greeting
+        message += " Hello! I'm " + BOT_NAME + "\n" + " What can I do for you?" + "\n";
+        if (tasksResult.listSize() > 0 || tasksResult.skipped() > 0) {
+
             message += String.format(" (Loaded %d tasks from disk%s)\n",
-                    result.taskSize(),
-                    result.skipped() > 0
+                    tasksResult.listSize(),
+                    tasksResult.skipped() > 0
                             ? String.format(", skipped %d corrupted lines",
-                            result.skipped())
+                            tasksResult.skipped())
                             : "");
-            message += result.tasks().list();
+            message += tasksResult.list().list();
         } else {
-            message += printLine();
             message += " There are currently no tasks in your list \n";
         }
         message += printLine();
+
+        // show clientsResult if available, if not, do standard greeting
+        if (clientsResult.listSize() > 0 || clientsResult.skipped() > 0) {
+            message += String.format(" (Loaded %d clients from disk%s)\n",
+                    clientsResult.listSize(),
+                    clientsResult.skipped() > 0
+                            ? String.format(", skipped %d corrupted lines",
+                            clientsResult.skipped())
+                            : "");
+            message += clientsResult.list().list();
+        } else {
+            message += " There are currently no clients in your list \n";
+        }
         return message;
     }
 }
