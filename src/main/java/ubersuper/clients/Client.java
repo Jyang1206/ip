@@ -43,4 +43,8 @@ public class Client {
     public String formatString() {
         return name + "|" + phone + "|" + email;
     }
+
+    public String getName() {
+        return name;
+    }
 }
