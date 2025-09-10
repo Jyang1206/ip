@@ -1,8 +1,9 @@
 package ubersuper.tasks;
 
 import ubersuper.exceptions.UberExceptions;
-import ubersuper.utils.DataStorage;
+import ubersuper.utils.storage.DataStorage;
 import ubersuper.utils.Parser;
+import ubersuper.utils.storage.TaskStorage;
 import ubersuper.utils.ui.Ui;
 
 import java.time.LocalDate;
@@ -28,15 +29,15 @@ import java.util.stream.IntStream;
  * </ul>
  */
 public class TaskList extends ArrayList<Task> {
-    private final DataStorage dataStorage;
+    private final TaskStorage taskStorage;
 
     /**
      * Creates a {@code TaskList} bound to a storage backend.
      *
-     * @param dataStorage storage component used to save/load the task list (maybe {@code null} in tests)
+     * @param taskStorage storage component used to save/load the task list (maybe {@code null} in tests)
      */
-    public TaskList(DataStorage dataStorage) {
-        this.dataStorage = dataStorage;
+    public TaskList(TaskStorage taskStorage) {
+        this.taskStorage = taskStorage;
     }
 
     /**
@@ -59,7 +60,7 @@ public class TaskList extends ArrayList<Task> {
             assert t != null : "Task retrieved for marking should not be null";
             t.mark();
             // save after changing done status
-            dataStorage.save(this);
+            taskStorage.save(this);
             message += Ui.printLine();
             message += "Nice! I've marked this task as done: \n";
             message += t + "\n";
@@ -88,7 +89,7 @@ public class TaskList extends ArrayList<Task> {
             Task t = this.get(i - 1);
             assert t != null : "Task retrieved for marking should not be null";
             t.unmark();
-            dataStorage.save(this);
+            taskStorage.save(this);
             message += Ui.printLine();
             message += "Ok, I've marked this task as not done yet: \n";
             message += t + "\n";
@@ -131,7 +132,7 @@ public class TaskList extends ArrayList<Task> {
     public String save(Task t) {
         assert t != null : "Task passed to save() must not be null";
         String message = "";
-        dataStorage.save(this);
+        taskStorage.save(this);
         message += String.format("You now have %d tasks in the list \n", this.size());
         message = Ui.printLine() + "Got it! I've added this task:\n" + t + "\n" + message + Ui.printLine();
         return message;
@@ -319,7 +320,7 @@ public class TaskList extends ArrayList<Task> {
             }
             Task t = this.get(i - 1);
             this.remove(i - 1);
-            dataStorage.save(this);
+            taskStorage.save(this);
             message += String.format("You now have %d tasks in the list \n", this.size());
             message = Ui.printLine()
                     + "Ok, I've removed this task from the list: \n"

@@ -1,5 +1,7 @@
 package ubersuper.tasks;
 
+import ubersuper.utils.storage.DataStorage;
+
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
@@ -7,7 +9,7 @@ import java.time.LocalDateTime;
  * A {@link Task} that has a deadline timestamp.
  * <p>
  * The deadline is stored as a {@link LocalDateTime} and is printed in a
- * user-friendly format by {@link #toString()} while stored in {@link ubersuper.utils.DataStorage} in an
+ * user-friendly format by {@link #toString()} while stored in {@link DataStorage} in an
  * ISO-local date-time format by {@link #formatString()}.
  */
 public class Deadline extends Task {

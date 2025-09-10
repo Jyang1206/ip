@@ -17,8 +17,6 @@ import ubersuper.utils.command.CommandType;
  *   <li>Printing standard UI messages (greeting, divider line, goodbye, errors)</li>
  * </ul>
  * <p>
- * This class does not mutate storage directly; all task operations are delegated
- * to {@link TaskList}. The command parsing of the first token is handled by
  * {@link Parser#fromInput(String)}.
  */
 public class Ui {

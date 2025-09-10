@@ -1,54 +1,26 @@
-package ubersuper.utils;
+package ubersuper.utils.storage;
 
-import ubersuper.tasks.*;
+import ubersuper.tasks.Deadline;
+import ubersuper.tasks.Event;
+import ubersuper.tasks.Task;
+import ubersuper.tasks.TaskList;
+import ubersuper.tasks.Todo;
+import ubersuper.utils.LoadedResult;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
+public class TaskStorage extends DataStorage<TaskList> {
 
-/**
- * Stores {@link Task} data to disk and loads them back at startup.
- *
- * <h2>Storage file</h2>
- * <ul>
- *   <li>Location: {@code data/<fileName>} inside the working directory.</li>
- *   <li>Format: {@code [TaskType] | [Status] | [Description] | [Date/Time] }</li>
- *   <li>TaskType: {@code T} (Todo), {@code D} (Deadline), {@code E} (Event)</li>
- *   <li>Status: {@code 0} for not done, {@code 1} for done</li>
- *   <li>Date/Time:
- *     <ul>
- *       <li>Deadline: one {@code ISO_LOCAL_DATE_TIME} value </li>
- *       <li>Event   : two {@code ISO_LOCAL_DATE_TIME} values (start | end)</li>
- *     </ul>
- *   </li>
- * </ul>
- *
- * <p>The class also ensures the {@code data/} directory and the target file exist
- * (creating them if missing) before any read/write operation.</p>
- */
-@SuppressWarnings("checkstyle:Indentation")
-public class DataStorage {
-    /**
-     * Absolute/relative path to the backing data file (under {@code data/}).
-     */
-    private final Path dataPath;
-
-    /**
-     * Creates a storage that reads/writes to {@code data/<fileName>}.
-     *
-     * @param fileName file name to use inside the {@code data/} folder (e.g., {@code "uberSuper.txt"})
-     */
-    @SuppressWarnings({"checkstyle:Indentation", "checkstyle:CommentsIndentation"})
-    public DataStorage(String fileName) {
-        dataPath = Paths.get("data", fileName);
+    public TaskStorage() {
+        super("uberSuperTasks.txt");
     }
 
     /**
@@ -62,7 +34,7 @@ public class DataStorage {
      * @return a {@link LoadedResult} containing the populated {@link TaskList}, number of tasks loaded,
      * and number of lines skipped.
      **/
-    public LoadedResult load() {
+    public LoadedResult<TaskList> load() {
         TaskList tasks = new TaskList(this);
         int skipped = 0;
         try {
@@ -71,7 +43,7 @@ public class DataStorage {
             }
             if (Files.notExists(dataPath)) {
                 Files.createFile(dataPath);
-                return new LoadedResult(tasks, 0, 0);
+                return new LoadedResult<TaskList>(tasks, 0, 0);
             }
             List<String> lines = Files.readAllLines(dataPath, StandardCharsets.UTF_8);
             // parse each line -> Task or null
@@ -142,10 +114,10 @@ public class DataStorage {
             // count skipped lines
             skipped = (int) parsedTasks.stream().filter(Objects::isNull).count();
 
-            return new LoadedResult(tasks, tasks.size(), skipped);
+            return new LoadedResult<TaskList>(tasks, tasks.size(), skipped);
 
         } catch (IOException ioe) {
-            return new LoadedResult(tasks, 0, 0);
+            return new LoadedResult<TaskList>(tasks, 0, 0);
         }
     }
 
@@ -157,7 +129,7 @@ public class DataStorage {
      *   <li>Writes using UTF-8; truncates the file first.</li>
      * </ul>
      *
-     * @param tasks task list to serialize and persist
+     * @param tasks list of tasks to be saved
      */
     @SuppressWarnings({"checkstyle:Indentation", "checkstyle:LineLength", "checkstyle:CommentsIndentation"})
     public void save(TaskList tasks) {

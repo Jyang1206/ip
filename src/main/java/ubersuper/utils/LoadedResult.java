@@ -1,46 +1,47 @@
 package ubersuper.utils;
+import ubersuper.utils.storage.DataStorage;
 
-import ubersuper.tasks.TaskList;
+import java.util.ArrayList;
 
 /**
- * Result of loading tasks from persistent storage.
+ * Result of loading list from persistent storage.
  * <p>
  * This is a simple immutable holder returned by {@link DataStorage#load()} that
  * carries:
  * <ul>
- *   <li>{@code tasks}: the loaded {@link TaskList} (possibly empty),</li>
- *   <li>{@code taskSize}: number of tasks successfully loaded,</li>
+ *   <li>{@code list}: the loaded list (possibly empty),</li>
+ *   <li>{@code listSize}: number of objects in list successfully loaded,</li>
  *   <li>{@code skipped}: number of lines skipped due to parse/format errors.</li>
  * </ul>
  */
-public class LoadedResult {
-    private final TaskList tasks;
-    private final int taskSize;
+public class LoadedResult<T> {
+    private final T list;
+    private final int listSize;
     private final int skipped;
 
     /**
      * Creates a {@code LoadedResult}.
      *
-     * @param tasks    the loaded task list (non-null)
-     * @param taskSize count of tasks successfully loaded into {@code tasks}
+     * @param list    the loaded task list (non-null)
+     * @param listSize count of list successfully loaded into {@code list}
      * @param skipped  count of corrupted/unsupported lines skipped during load
      */
-    public LoadedResult(TaskList tasks, int taskSize, int skipped) {
-        this.tasks = tasks;
-        this.taskSize = taskSize;
+    public LoadedResult(T list, int listSize, int skipped) {
+        this.list = list;
+        this.listSize = listSize;
         this.skipped = skipped;
     }
 
-    public int taskSize() {
-        return this.taskSize;
+    public int listSize() {
+        return this.listSize;
     }
 
     public int skipped() {
         return this.skipped;
     }
 
-    public TaskList tasks() {
-        return this.tasks;
+    public T list() {
+        return this.list;
     }
 
 }
