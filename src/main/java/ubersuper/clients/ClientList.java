@@ -2,7 +2,8 @@ package ubersuper.clients;
 
 import ubersuper.exceptions.UberExceptions;
 import ubersuper.tasks.Task;
-import ubersuper.utils.DataStorage;
+import ubersuper.utils.storage.ClientStorage;
+import ubersuper.utils.storage.DataStorage;
 import ubersuper.utils.ui.Ui;
 
 import java.util.ArrayList;
@@ -24,10 +25,10 @@ import java.util.stream.IntStream;
  * </ul>
  */
 public class ClientList extends ArrayList<Client> {
-    private final DataStorage dataStorage;
+    private final ClientStorage clientStorage;
 
-    public ClientList(DataStorage dataStorage) {
-        this.dataStorage = dataStorage;
+    public ClientList(ClientStorage clientStorage) {
+        this.clientStorage = clientStorage;
     }
 
     /**
@@ -36,11 +37,11 @@ public class ClientList extends ArrayList<Client> {
      * @param c the Client that was just added
      * @return String message
      */
-    public String save(Task c) {
+    public String save(Client c) {
         assert c != null : "Client passed to save() must not be null";
         String message = "";
-        dataStorage.save(this);
-        message += String.format("You now have %d tasks in the list \n", this.size());
+        clientStorage.save(this);
+        message += String.format("You now have %d clients in the list \n", this.size());
         message = Ui.printLine() + "Got it! I've added this client:\n" + c + "\n" + message + Ui.printLine();
         return message;
     }
@@ -73,7 +74,7 @@ public class ClientList extends ArrayList<Client> {
             }
             Client t = this.get(i - 1);
             this.remove(i - 1);
-            dataStorage.save(this);
+            clientStorage.save(this);
             message += String.format("You now have %d clients in the list \n", this.size());
             message = Ui.printLine()
                     + "Ok, I've removed this client from the list: \n"
@@ -136,7 +137,7 @@ public class ClientList extends ArrayList<Client> {
     public String save(Task t) {
         assert t != null : "Task passed to save() must not be null";
         String message = "";
-        dataStorage.save(this);
+        clientStorage.save(this);
         message += String.format("You now have %d clients in the list \n", this.size());
         message = Ui.printLine() + "Got it! I've added this task:\n" + t + "\n" + message + Ui.printLine();
         return message;
