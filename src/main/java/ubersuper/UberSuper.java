@@ -2,12 +2,14 @@ package ubersuper;
 
 import java.util.Scanner;
 
+import ubersuper.clients.ClientList;
 import ubersuper.exceptions.UberExceptions;
+import ubersuper.tasks.Task;
 import ubersuper.tasks.TaskList;
-import ubersuper.utils.DataStorage;
+import ubersuper.utils.storage.ClientStorage;
+import ubersuper.utils.storage.DataStorage;
 import ubersuper.utils.LoadedResult;
-import ubersuper.utils.Parser;
-import ubersuper.utils.command.CommandType;
+import ubersuper.utils.storage.TaskStorage;
 import ubersuper.utils.ui.Ui;
 
 /**
@@ -18,14 +20,17 @@ import ubersuper.utils.ui.Ui;
 
 public class UberSuper {
     private final Scanner sc = new Scanner(System.in);
-    private final DataStorage storage = new DataStorage("uberSuper.txt");
-    private final LoadedResult result = storage.load();
-    private final TaskList taskList = result.tasks();
-    private final Ui ui = new Ui(taskList);
+    private final TaskStorage taskStorage = new TaskStorage();
+    private final ClientStorage clientStorage = new ClientStorage();
+    private final LoadedResult<TaskList> tasksResult = taskStorage.load();
+    private final LoadedResult<ClientList> clientsResult = clientStorage.load();
+    private final TaskList taskList = tasksResult.list();
+    private final ClientList clientList = clientsResult.list();
+    private final Ui ui = new Ui(taskList, clientList);
     private String commandType;
 
     public String greet() {
-        return ui.greet(result);
+        return ui.greet(tasksResult,clientsResult);
     }
 
     public String getResponse(String input) {

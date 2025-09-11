@@ -1,5 +1,7 @@
 package ubersuper.tasks;
 
+import ubersuper.utils.storage.DataStorage;
+
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
@@ -8,7 +10,7 @@ import java.time.LocalDateTime;
  * <p>
  * The startTime and endTime is stored as a {@link LocalDateTime} and is printed in a
  * user-friendly display format (date-only if time is midnight) by {@link #toString()}
- * while stored in {@link ubersuper.utils.DataStorage} in an ISO-local date-time format
+ * while stored in {@link DataStorage} in an ISO-local date-time format
  * by {@link #formatString()}.,
  */
 public class Event extends Task {
