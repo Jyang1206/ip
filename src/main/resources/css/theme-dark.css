@@ -1,0 +1,9 @@
+.root {
+    -color-bg: #0b1220;
+    -color-surface: #0f172a;
+    -color-text: #e5e7eb;
+    -color-accent: #60a5fa;
+    -color-accent-weak: #1e293b;
+    -fx-background-color: -color-bg;
+}
+
