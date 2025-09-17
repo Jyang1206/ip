@@ -18,3 +18,9 @@
     -fx-scale-y: 1;
     -fx-rotate: 0;
 }
+
+.error-label {
+    -fx-background-color: linear-gradient(to bottom right, #fee2e2, #fecaca);
+    -fx-text-fill: #991b1b;
+    -fx-border-width: 1;
+}

@@ -8,7 +8,6 @@ import ubersuper.utils.Parser;
 import ubersuper.utils.command.CommandType;
 
 
-
 /**
  * Handles all user-facing I/O for the UberSuper app.
  * <p>
@@ -30,12 +29,13 @@ public class Ui {
     /**
      * @param tasks the task list to operate on when handling commands
      */
-    public Ui(TaskList tasks , ClientList clients) {
+    public Ui(TaskList tasks, ClientList clients) {
         assert tasks != null : "Ui must be created with a non-null TaskList";
         this.tasks = tasks;
         assert clients != null : "Ui must be created with a non-null ClientList";
         this.clients = clients;
     }
+
     /**
      * Runs the main command loop.
      * <p>
@@ -46,49 +46,46 @@ public class Ui {
      * If a command is unknown or a handler throws an {@link UberExceptions},
      * an error message is printed and the loop continues to read the next line.
      */
-    public String echo(String raw) {
+    public String echo(String raw) throws UberExceptions {
         String input = raw.trim();
         CommandType command = Parser.fromInput(input);
         assert command != null : "Parser must return a valid CommandType";
 
-        try {
-            switch (command) {
-            case BYE:
-                return goodBye();
-            case TASKLIST:
-                return tasks.list();
-            case MARK:
-                return tasks.mark(input);
-            case UNMARK:
-                return tasks.unmark(input);
-            case TODO:
-                return tasks.todo(input);
-            case DEADLINE:
-                return tasks.deadline(input);
-            case EVENT:
-                return tasks.event(input);
-            case DELETETASK:
-                return tasks.delete(input);
-            case ONDATE:
-                return tasks.onDate(input);
-            case FINDTASK:
-                return tasks.find(input);
-            case FINDCLIENT:
-                return clients.find(input);
-            case DELETECLIENT:
-                return clients.delete(input);
-            case CLIENTLIST:
-                return clients.list();
-            case ADDCLIENT:
-                return clients.add(input);
-            case UNKNOWN:
-            default:
-                throw new UberExceptions("Sorry! I have no idea what you're trying to do.");
-            }
-        } catch (UberExceptions e) {
-            return Ui.printLine() + e.getMessage() + "\n" + Ui.printLine();
+        switch (command) {
+        case BYE:
+            return goodBye();
+        case TASKLIST:
+            return tasks.list();
+        case MARK:
+            return tasks.mark(input);
+        case UNMARK:
+            return tasks.unmark(input);
+        case TODO:
+            return tasks.todo(input);
+        case DEADLINE:
+            return tasks.deadline(input);
+        case EVENT:
+            return tasks.event(input);
+        case DELETETASK:
+            return tasks.delete(input);
+        case ONDATE:
+            return tasks.onDate(input);
+        case FINDTASK:
+            return tasks.find(input);
+        case FINDCLIENT:
+            return clients.find(input);
+        case DELETECLIENT:
+            return clients.delete(input);
+        case CLIENTLIST:
+            return clients.list();
+        case ADDCLIENT:
+            return clients.add(input);
+        case UNKNOWN:
+        default:
+            throw new UberExceptions("Sorry! I have no idea what you're trying to do.");
         }
     }
+
     /**
      * Prints a standard horizontal divider line used by the UI.
      * <p>
@@ -107,7 +104,7 @@ public class Ui {
      * @return String message
      */
     public String goodBye() {
-        return "Bye. Hope to see you again soon! \n" + printLine();
+        return "Bye. Hope to see you again soon! \n";
     }
 
 
@@ -118,7 +115,7 @@ public class Ui {
      * lines were skipped due to errors, then prints the current list of tasks.
      * Otherwise, informs the user that the list is empty.
      *
-     * @param tasksResult the outcome of loading tasks from disk
+     * @param tasksResult   the outcome of loading tasks from disk
      * @param clientsResult the outcome of loading clients from disk
      */
     public String greet(LoadedResult<TaskList> tasksResult, LoadedResult<ClientList> clientsResult) {

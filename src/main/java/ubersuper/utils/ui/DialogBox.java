@@ -65,5 +65,12 @@ public class DialogBox extends HBox {
         db.flip();
         return db;
     }
+
+    public static DialogBox getUberErrorDialog(String text, Image img) {
+        var db = new DialogBox(text, img);
+        db.dialog.getStyleClass().add("error-label");
+        db.flip();
+        return db;
+    }
 }
 

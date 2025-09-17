@@ -1,6 +1,7 @@
 package ubersuper.utils.ui;
 
 import javafx.animation.FadeTransition;
+import javafx.animation.PauseTransition;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.Scene;
@@ -13,10 +14,8 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.VBox;
 import javafx.util.Duration;
 import ubersuper.UberSuper;
-import ubersuper.clients.ClientList;
-import ubersuper.utils.LoadedResult;
-
-import java.time.LocalDateTime;
+import ubersuper.exceptions.UberExceptions;
+import javafx.application.Platform;
 
 /**
  * Controller for the main GUI.
@@ -92,13 +91,28 @@ public class MainWindow extends AnchorPane {
     @FXML
     private void handleUserInput() {
         String input = userInput.getText();
-        String response = uberSuper.getResponse(input);
-        Node userNode = DialogBox.getUserDialog(input, userImage);
-        Node uberNode = DialogBox.getUberDialog(response, uberSuperImage);
-        dialogContainer.getChildren().addAll(userNode, uberNode);
-        fadeIn(userNode);
-        fadeIn(uberNode);
-        userInput.clear();
+        Node userNode = null;
+        Node uberNode = null;
+        try {
+            String response = uberSuper.getResponse(input);
+            userNode = DialogBox.getUserDialog(input, userImage);
+            uberNode = DialogBox.getUberDialog(response, uberSuperImage);
+        } catch (UberExceptions e) {
+            userNode = DialogBox.getUserDialog(input, userImage);
+            uberNode = DialogBox.getUberErrorDialog(e.getMessage(), uberSuperImage);
+        } finally {
+            assert userNode != null && uberNode != null : "userNode and uberNode should not be null";
+            dialogContainer.getChildren().addAll(userNode, uberNode);
+            fadeIn(userNode);
+            fadeIn(uberNode);
+            userInput.clear();
+            // Exit if user typed 'bye' after a short delay to allow UI to render
+            if (input.trim().equalsIgnoreCase("bye")) {
+                PauseTransition delay = new PauseTransition(Duration.millis(1000));
+                delay.setOnFinished(e -> Platform.exit());
+                delay.play();
+            }
+        }
     }
 
     /**
