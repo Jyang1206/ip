@@ -2,6 +2,7 @@ package ubersuper.utils.ui;
 
 import javafx.animation.FadeTransition;
 import javafx.animation.PauseTransition;
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.Scene;
@@ -15,7 +16,6 @@ import javafx.scene.layout.VBox;
 import javafx.util.Duration;
 import ubersuper.UberSuper;
 import ubersuper.exceptions.UberExceptions;
-import javafx.application.Platform;
 
 /**
  * Controller for the main GUI.
@@ -50,7 +50,10 @@ public class MainWindow extends AnchorPane {
      */
     @FXML
     public void initialize() {
-        scrollPane.vvalueProperty().bind(dialogContainer.heightProperty());
+
+        dialogContainer.heightProperty().addListener((obs, oldVal, newVal) -> {
+            scrollPane.setVvalue(1.0); // always scrolls to bottom on new content
+        });
         // Keyboard shortcuts: Enter to send, Shift+Enter for newline
         userInput.setOnKeyPressed(event -> {
             switch (event.getCode()) {

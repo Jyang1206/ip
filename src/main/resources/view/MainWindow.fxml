@@ -3,8 +3,10 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-<AnchorPane fx:id="root" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0"
-            prefWidth="420.0" stylesheets="@../css/main.css, @../css/theme-light.css" xmlns="http://javafx.com/javafx/17"
+<AnchorPane fx:id="root" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity"
+            prefHeight="600.0"
+            prefWidth="420.0" stylesheets="@../css/main.css, @../css/theme-light.css"
+            xmlns="http://javafx.com/javafx/17"
             xmlns:fx="http://javafx.com/fxml/1" fx:controller="ubersuper.utils.ui.MainWindow">
     <children>
         <!-- Header -->
@@ -21,10 +23,11 @@
         </HBox>
 
         <!-- Messages -->
-        <ScrollPane fx:id="scrollPane" fitToWidth="true" hbarPolicy="NEVER" vvalue="1.0" AnchorPane.bottomAnchor="74.0"
+        <ScrollPane fx:id="scrollPane" fitToWidth="true" hbarPolicy="NEVER" vbarPolicy="AS_NEEDED"
+                    AnchorPane.bottomAnchor="74.0"
                     AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="52.0">
             <content>
-                <VBox fx:id="dialogContainer" prefWidth="388.0" spacing="6.0" styleClass="dialog-container"/>
+                <VBox fx:id="dialogContainer" fillWidth="true" spacing="6.0" styleClass="dialog-container"/>
             </content>
         </ScrollPane>
 
