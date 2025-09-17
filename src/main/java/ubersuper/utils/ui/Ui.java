@@ -121,10 +121,10 @@ public class Ui {
     public String greet(LoadedResult<TaskList> tasksResult, LoadedResult<ClientList> clientsResult) {
         String message = "";
         // show tasksResult if available, if not, do standard greeting
-        message += " Hello! I'm " + BOT_NAME + "\n" + " What can I do for you?" + "\n";
+        message += " Hello! I'm " + BOT_NAME + "\n" + " What can I do for you?" + "\n" + LINE + "\n";
         if (tasksResult.listSize() > 0 || tasksResult.skipped() > 0) {
 
-            message += String.format(" (Loaded %d tasks from disk%s)\n",
+            message += String.format("(Loaded %d tasks from disk%s)\n",
                     tasksResult.listSize(),
                     tasksResult.skipped() > 0
                             ? String.format(", skipped %d corrupted lines",
@@ -138,7 +138,7 @@ public class Ui {
 
         // show clientsResult if available, if not, do standard greeting
         if (clientsResult.listSize() > 0 || clientsResult.skipped() > 0) {
-            message += String.format(" (Loaded %d clients from disk%s)\n",
+            message += String.format("(Loaded %d clients from disk%s)\n",
                     clientsResult.listSize(),
                     clientsResult.skipped() > 0
                             ? String.format(", skipped %d corrupted lines",
