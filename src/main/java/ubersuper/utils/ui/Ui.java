@@ -13,8 +13,8 @@ import ubersuper.utils.command.CommandType;
  * <p>
  * Responsibilities:
  * <ul>
- *   <li>Routing recognized commands to the appropriate {@link TaskList} methods</li>
- *   <li>Printing standard UI messages (greeting, divider line, goodbye, errors)</li>
+ * <li>Routing recognized commands to the appropriate {@link TaskList} methods</li>
+ * <li>Printing standard UI messages (greeting, divider line, goodbye, errors)</li>
  * </ul>
  * <p>
  * {@link Parser#fromInput(String)}.
@@ -22,7 +22,7 @@ import ubersuper.utils.command.CommandType;
 public class Ui {
 
     private static final String BOT_NAME = "UberSuper";
-    private static final String LINE = "_________________________________";
+    private static final String LINE = "------------------------------------------------------------";
     private final TaskList tasks;
     private final ClientList clients;
 
@@ -82,7 +82,7 @@ public class Ui {
             return clients.add(input);
         case UNKNOWN:
         default:
-            throw new UberExceptions("Sorry! I have no idea what you're trying to do.");
+            throw new UberExceptions("Unknown command.\n\n" + Ui.help());
         }
     }
 
@@ -149,6 +149,54 @@ public class Ui {
             message += " There are currently no clients in your list \n";
         }
         return message;
+    }
+
+    /**
+     * Returns a formatted help message describing all available commands grouped by domain.
+     *
+     * @return multi-line help text for task and client commands
+     */
+    public static String help() {
+        String nl = "\n";
+        StringBuilder sb = new StringBuilder();
+        sb.append("Here are the available commands:" + nl + nl);
+        sb.append("Tasks:" + nl);
+        sb.append(LINE + nl);
+        sb.append("'list' - Show all tasks" + nl);
+        sb.append(LINE + nl);
+        sb.append("'todo' <desc> - Add a todo" + nl);
+        sb.append(LINE + nl);
+        sb.append("'deadline <d> /by <t>' - Add a deadline (e.g. 2025-12-31 18:00)" + nl);
+        sb.append(LINE + nl);
+        sb.append("'event <d> /from <s> /to <e>' - Add an event with start/end" + nl);
+        sb.append(LINE + nl);
+        sb.append("'delete <idx>' - Delete task by number" + nl);
+        sb.append(LINE + nl);
+        sb.append("'mark <idx>' - Mark task done" + nl);
+        sb.append(LINE + nl);
+        sb.append("'unmark <idx>' - Mark task not done" + nl);
+        sb.append(LINE + nl);
+        sb.append("'onDate <yyyy-mm-dd>' - Show items on a specific date" + nl);
+        sb.append(LINE + nl);
+        sb.append("'findtask <keywords>' - Search tasks by description" + nl + nl);
+        sb.append(LINE + nl);
+
+        sb.append("Clients:" + nl);
+        sb.append(LINE + nl);
+        sb.append("'clientlist' - Show all clients" + nl);
+        sb.append(LINE + nl);
+        sb.append("'addclient <name> /phone <p> /email <e>' - Add a client" + nl);
+        sb.append(LINE + nl);
+        sb.append("'deleteclient <idx>' - Delete client by number" + nl);
+        sb.append(LINE + nl);
+        sb.append("'findclient <name>' - Search clients by name" + nl + nl);
+        sb.append(LINE + nl);
+
+        sb.append("Other:" + nl);
+        sb.append(LINE + nl);
+        sb.append("'bye' - Exit the app" + nl);
+        sb.append(LINE + nl);
+        return sb.toString();
     }
 }
 

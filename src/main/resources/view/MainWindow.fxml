@@ -11,7 +11,7 @@
         <HBox spacing="10.0" styleClass="header" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0"
               AnchorPane.topAnchor="0.0">
             <children>
-                <Label styleClass="title" text="UberSuper"/>
+                <Label styleClass="title" text="UberSuper - Task and Client Management System"/>
                 <Region HBox.hgrow="ALWAYS"/>
                 <ToggleButton fx:id="themeToggle" onAction="#handleChangeMode" text="Dark"/>
             </children>
