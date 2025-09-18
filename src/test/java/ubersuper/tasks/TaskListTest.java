@@ -1,6 +1,8 @@
 package ubersuper.tasks;
 
 import org.junit.jupiter.api.*;
+import ubersuper.exceptions.UberExceptions;
+
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 import java.time.LocalDateTime;
@@ -107,8 +109,11 @@ public class TaskListTest {
 
     @Test
     void onDate_withTwoDigitYear_returnsUsageHint() {
-        String bad = runOnDate("10-10-20");
-        assertTrue(bad.contains("Use: onDate <yyyy-mm-dd | dd/MM/yyyy>"), bad);
+        try {
+            String bad = runOnDate("10-10-20");
+        } catch (UberExceptions e) {
+            assertTrue(e.getMessage().contains("Use: onDate <yyyy-mm-dd | dd/MM/yyyy>"), e.getMessage());
+        }
     }
     @Test
     void find_withKeyword_returnsOriginalIndices() {

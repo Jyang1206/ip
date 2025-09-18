@@ -1,16 +1,14 @@
 package ubersuper;
 
-import java.util.Scanner;
-
 import ubersuper.clients.ClientList;
 import ubersuper.exceptions.UberExceptions;
-import ubersuper.tasks.Task;
 import ubersuper.tasks.TaskList;
-import ubersuper.utils.storage.ClientStorage;
-import ubersuper.utils.storage.DataStorage;
 import ubersuper.utils.LoadedResult;
+import ubersuper.utils.storage.ClientStorage;
 import ubersuper.utils.storage.TaskStorage;
 import ubersuper.utils.ui.Ui;
+
+import java.util.Scanner;
 
 /**
  * Entry point of the UberSuper application.
@@ -30,16 +28,13 @@ public class UberSuper {
     private String commandType;
 
     public String greet() {
-        return ui.greet(tasksResult,clientsResult);
+        return ui.greet(tasksResult, clientsResult);
     }
 
-    public String getResponse(String input) {
-        try {
-            return ui.echo(input);
-        } catch (UberExceptions e) {
-            return "Error: " + e.getMessage();
-        }
+    public String getResponse(String input) throws UberExceptions {
+        return ui.echo(input);
     }
+
     public String getCommandType() {
         return commandType;
     }

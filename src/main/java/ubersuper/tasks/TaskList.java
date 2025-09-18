@@ -1,8 +1,8 @@
 package ubersuper.tasks;
 
 import ubersuper.exceptions.UberExceptions;
-import ubersuper.utils.storage.DataStorage;
 import ubersuper.utils.Parser;
+import ubersuper.utils.storage.DataStorage;
 import ubersuper.utils.storage.TaskStorage;
 import ubersuper.utils.ui.Ui;
 
@@ -15,7 +15,6 @@ import java.util.Arrays;
 import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
-
 /**
  * Mutable list of {@link Task} items plus high-level operations used by the UI.
  * <p>
@@ -47,27 +46,21 @@ public class TaskList extends ArrayList<Task> {
      * @return String message
      * @throws UberExceptions if the index is missing or out of range
      */
-    public String mark(String input) {
+    public String mark(String input) throws UberExceptions {
         String message = "";
         String[] parts = input.split("\\s+", 2);
         int i = Integer.parseInt(parts[1]);
-
-        try {
-            if (i < 1 || i > this.size()) {
-                throw new UberExceptions("There's no such task in the list");
-            }
-            Task t = this.get(i - 1);
-            assert t != null : "Task retrieved for marking should not be null";
-            t.mark();
-            // save after changing done status
-            taskStorage.save(this);
-            message += Ui.printLine();
-            message += "Nice! I've marked this task as done: \n";
-            message += t + "\n";
-            message += Ui.printLine();
-        } catch (UberExceptions e) {
-            return Ui.printLine() + e.getMessage() + "\n" + Ui.printLine();
+        if (i < 1 || i > this.size()) {
+            throw new UberExceptions("There's no such task in the list");
         }
+        Task t = this.get(i - 1);
+        assert t != null : "Task retrieved for marking should not be null";
+        t.mark();
+        taskStorage.save(this);
+        message += Ui.printLine();
+        message += "Nice! I've marked this task as done: \n";
+        message += t + "\n";
+        message += Ui.printLine();
         return message;
     }
 
@@ -78,25 +71,21 @@ public class TaskList extends ArrayList<Task> {
      * @return String message
      * @throws UberExceptions if the index is missing or out of range
      */
-    public String unmark(String input) {
+    public String unmark(String input) throws UberExceptions {
         String message = "";
         String[] parts = input.split("\\s+", 2);
         int i = Integer.parseInt(parts[1]);
-        try {
-            if (i < 1 || i > this.size()) {
-                throw new UberExceptions("There's no such task in the list");
-            }
-            Task t = this.get(i - 1);
-            assert t != null : "Task retrieved for marking should not be null";
-            t.unmark();
-            taskStorage.save(this);
-            message += Ui.printLine();
-            message += "Ok, I've marked this task as not done yet: \n";
-            message += t + "\n";
-            message += Ui.printLine();
-        } catch (UberExceptions e) {
-            return Ui.printLine() + e.getMessage() + "\n" + Ui.printLine();
+        if (i < 1 || i > this.size()) {
+            throw new UberExceptions("There's no such task in the list");
         }
+        Task t = this.get(i - 1);
+        assert t != null : "Task retrieved for marking should not be null";
+        t.unmark();
+        taskStorage.save(this);
+        message += Ui.printLine();
+        message += "Ok, I've marked this task as not done yet: \n";
+        message += t + "\n";
+        message += Ui.printLine();
         return message;
     }
 
@@ -108,19 +97,14 @@ public class TaskList extends ArrayList<Task> {
      * @return String message
      * @throws UberExceptions if the description is missing/blank
      */
-    public String todo(String input) {
-        String message = "";
-        try {
-            String[] parts = input.split("\\s+", 2);
-            if (parts.length < 2 || parts[1].trim().isEmpty()) {
-                throw new UberExceptions("You forgot to include what you're supposed to do");
-            }
-            Todo t = new Todo(parts[1].trim());
-            this.add(t);
-            return this.save(t);
-        } catch (UberExceptions e) {
-            return Ui.printLine() + e.getMessage() + "\n" + Ui.printLine();
+    public String todo(String input) throws UberExceptions {
+        String[] parts = input.split("\\s+", 2);
+        if (parts.length < 2 || parts[1].trim().isEmpty()) {
+            throw new UberExceptions("You forgot to include what you're supposed to do");
         }
+        Todo t = new Todo(parts[1].trim());
+        this.add(t);
+        return this.save(t);
     }
 
     /**
@@ -151,29 +135,25 @@ public class TaskList extends ArrayList<Task> {
      * @return String message
      * @throws UberExceptions if the format is wrong or date-time cannot be parsed
      */
-    public String deadline(String input) {
-        try {
-            String[] parts = input.split("/");
-            if (parts.length < 2) {
-                throw new UberExceptions("Provide a proper deadline,");
-            }
-            String desc = parts[0].replaceFirst("deadline", "").trim();
-            String[] p1 = parts[1].trim().split("\\s+", 2);
-            if (p1.length < 2 || !p1[0].equalsIgnoreCase("by")) {
-                throw new UberExceptions("Use format: deadline <desc> / by <time>");
-            }
-            String p2 = p1[1].trim();
-            if (desc.isEmpty()) {
-                throw new UberExceptions("Please provide a description");
-            }
-            LocalDateTime dl = Parser.parseDateTime(p2);
-            assert dl != null : "Parsed deadline datetime should not be null";
-            Deadline d = new Deadline(desc, dl);
-            this.add(d);
-            return this.save(d);
-        } catch (UberExceptions e) {
-            return Ui.printLine() + e.getMessage() + "\n" + Ui.printLine();
+    public String deadline(String input) throws UberExceptions {
+        String[] parts = input.split("/");
+        if (parts.length < 2) {
+            throw new UberExceptions("Provide a proper deadline,");
         }
+        String desc = parts[0].replaceFirst("deadline", "").trim();
+        String[] p1 = parts[1].trim().split("\\s+", 2);
+        if (p1.length < 2 || !p1[0].equalsIgnoreCase("by")) {
+            throw new UberExceptions("Use format: deadline <desc> / by <time>");
+        }
+        String p2 = p1[1].trim();
+        if (desc.isEmpty()) {
+            throw new UberExceptions("Please provide a description");
+        }
+        LocalDateTime dl = Parser.parseDateTime(p2);
+        assert dl != null : "Parsed deadline datetime should not be null";
+        Deadline d = new Deadline(desc, dl);
+        this.add(d);
+        return this.save(d);
     }
 
     /**
@@ -188,7 +168,7 @@ public class TaskList extends ArrayList<Task> {
      * @return String message
      * @throws UberExceptions if the format is wrong, dates cannot be parsed, or end &lt; start
      */
-    public String event(String input) {
+    public String event(String input) throws UberExceptions {
         try {
             String[] parts = input.split("/");
             if (parts.length < 2) {
@@ -242,54 +222,49 @@ public class TaskList extends ArrayList<Task> {
      * @param input full user input line, e.g., {@code "onDate 2019-12-02"}
      * @throws UberExceptions if the date cannot be parsed
      */
-    public String onDate(String input) {
+    public String onDate(String input) throws UberExceptions {
+        String[] parts = input.split("\\s+", 2);
+        if (parts.length < 2) {
+            throw new UberExceptions("Use: onDate <yyyy-mm-dd | dd/MM/yyyy>");
+        }
+        LocalDate day;
+        String raw = parts[1].trim();
         try {
-            String[] parts = input.split("\\s+", 2);
-            if (parts.length < 2) {
+            day = LocalDate.parse(raw);
+        } catch (DateTimeParseException ex) {
+            try {
+                DateTimeFormatter f = DateTimeFormatter.ofPattern("d/M/uuuu");
+                day = LocalDate.parse(raw, f);
+            } catch (DateTimeParseException e) {
                 throw new UberExceptions("Use: onDate <yyyy-mm-dd | dd/MM/yyyy>");
             }
-            LocalDate day;
-            String raw = parts[1].trim();
-            try {
-                day = LocalDate.parse(raw);
-            } catch (DateTimeParseException ex) {
-                try {
-                    DateTimeFormatter f = DateTimeFormatter.ofPattern("d/M/uuuu");
-                    day = LocalDate.parse(raw, f);
-                } catch (DateTimeParseException e) {
-                    throw new UberExceptions("Use: onDate <yyyy-mm-dd | dd/MM/yyyy>");
-                }
-            }
-
-            LocalDate finalDay = day;
-            String results = IntStream.range(0, this.size())
-                    .mapToObj(i -> {
-                        Task t = this.get(i);
-                        assert t != null : "Task in TaskList should not be null";
-                        if (t instanceof Deadline d) {
-                            if (d.isOnDate(finalDay)) {
-                                return ++i + ". " + t;
-                            }
-                        } else if (t instanceof Event ev) {
-                            // consider an event "occurring on" if any part of it touches that date
-                            if (ev.isOnDate(finalDay)) {
-                                return ++i + ". " + t;
-                            }
-                        }
-                        return null;
-                    })
-                    .filter(Objects::nonNull)
-                    .collect(Collectors.joining("\n"));
-
-            if (results.isBlank()) {
-                results = "(No items.)";
-            }
-            return "Items on " + day.format(DateTimeFormatter.ofPattern("MMM dd yyyy")) + ": \n"
-                    + results;
-
-        } catch (UberExceptions e) {
-            return Ui.printLine() + e.getMessage() + "\n" + Ui.printLine();
         }
+
+        LocalDate finalDay = day;
+        String results = IntStream.range(0, this.size())
+                .mapToObj(i -> {
+                    Task t = this.get(i);
+                    assert t != null : "Task in TaskList should not be null";
+                    if (t instanceof Deadline d) {
+                        if (d.isOnDate(finalDay)) {
+                            return ++i + ". " + t;
+                        }
+                    } else if (t instanceof Event ev) {
+                        // consider an event "occurring on" if any part of it touches that date
+                        if (ev.isOnDate(finalDay)) {
+                            return ++i + ". " + t;
+                        }
+                    }
+                    return null;
+                })
+                .filter(Objects::nonNull)
+                .collect(Collectors.joining("\n"));
+
+        if (results.isBlank()) {
+            results = "(No items.)";
+        }
+        return "Items on " + day.format(DateTimeFormatter.ofPattern("MMM dd yyyy")) + ": \n"
+                + results;
     }
 
     /**
@@ -310,26 +285,23 @@ public class TaskList extends ArrayList<Task> {
      * @param input full user input line, e.g., {@code "delete 1"}
      * @throws UberExceptions if the index is missing or out of range
      */
-    public String delete(String input) {
+    public String delete(String input) throws UberExceptions {
         String message = "";
         String[] parts = input.split("\\s+", 2);
         int i = Integer.parseInt(parts[1]);
-        try {
-            if (i > this.size()) {
-                throw new UberExceptions("You're deleting something that doesn't exist");
-            }
-            Task t = this.get(i - 1);
-            this.remove(i - 1);
-            taskStorage.save(this);
-            message += String.format("You now have %d tasks in the list \n", this.size());
-            message = Ui.printLine()
-                    + "Ok, I've removed this task from the list: \n"
-                    + t + "\n"
-                    + message
-                    + Ui.printLine();
-        } catch (UberExceptions e) {
-            return Ui.printLine() + e.getMessage() + "\n" + Ui.printLine();
+        if (i > this.size()) {
+            throw new UberExceptions("You're deleting something that doesn't exist");
         }
+        Task t = this.get(i - 1);
+        this.remove(i - 1);
+        taskStorage.save(this);
+        message += String.format("You now have %d tasks in the list \n", this.size());
+        message = Ui.printLine()
+                + "Ok, I've removed this task from the list: \n"
+                + t + "\n"
+                + message
+                + Ui.printLine();
+
         return message;
     }
 
@@ -345,7 +317,7 @@ public class TaskList extends ArrayList<Task> {
      * @return String message
      * Matching is OR across keywords: a task is listed if its description contains at least one keyword.
      */
-    public String find(String input) {
+    public String find(String input) throws UberExceptions {
         String[] parts = input.split("\\s+", 2);
         if (parts.length < 2 || parts[1].isBlank()) {
             throw new UberExceptions("Use: findtask <keyword(s)>");
@@ -368,7 +340,8 @@ public class TaskList extends ArrayList<Task> {
                 .collect(Collectors.joining("\n"));
 
         if (matches.isBlank()) {
-            matches = "(No matches.)";
+            String query = input.replaceFirst("findtask", "");
+            throw new UberExceptions(String.format("There are no matches for '%s' in your list", query));
         }
         return "Here are the matching tasks in your list: \n"
                 + matches;
