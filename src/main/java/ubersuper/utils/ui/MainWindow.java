@@ -94,17 +94,15 @@ public class MainWindow extends AnchorPane {
     @FXML
     private void handleUserInput() {
         String input = userInput.getText();
-        Node userNode = null;
+        Node userNode = DialogBox.getUserDialog(input, userImage);
         Node uberNode = null;
         try {
             String response = uberSuper.getResponse(input);
-            userNode = DialogBox.getUserDialog(input, userImage);
             uberNode = DialogBox.getUberDialog(response, uberSuperImage);
         } catch (UberExceptions e) {
-            userNode = DialogBox.getUserDialog(input, userImage);
             uberNode = DialogBox.getUberErrorDialog(e.getMessage(), uberSuperImage);
         } finally {
-            assert userNode != null && uberNode != null : "userNode and uberNode should not be null";
+            assert uberNode != null : "userNode and uberNode should not be null";
             dialogContainer.getChildren().addAll(userNode, uberNode);
             fadeIn(userNode);
             fadeIn(uberNode);

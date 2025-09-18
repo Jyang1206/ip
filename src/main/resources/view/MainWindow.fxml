@@ -1,46 +1,42 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.geometry.Insets?>
+<?import javafx.geometry.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-<AnchorPane fx:id="root" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity"
-            prefHeight="600.0"
-            prefWidth="420.0" stylesheets="@../css/main.css, @../css/theme-light.css"
-            xmlns="http://javafx.com/javafx/17"
-            xmlns:fx="http://javafx.com/fxml/1" fx:controller="ubersuper.utils.ui.MainWindow">
+<?import javafx.scene.text.*?>
+
+<AnchorPane fx:id="root" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="420.0" stylesheets="@../css/main.css, @../css/theme-light.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ubersuper.utils.ui.MainWindow">
     <children>
         <!-- Header -->
-        <HBox spacing="10.0" styleClass="header" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0"
-              AnchorPane.topAnchor="0.0">
+        <HBox layoutY="5.0" spacing="10.0" styleClass="header" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="5.0">
             <children>
-                <Label styleClass="title" text="UberSuper - Task and Client Management System"/>
-                <Region HBox.hgrow="ALWAYS"/>
-                <ToggleButton fx:id="themeToggle" onAction="#handleChangeMode" text="Dark"/>
+                <Label contentDisplay="BOTTOM" prefHeight="19.0" prefWidth="313.0" styleClass="title" text="UberSuper - Task/Client Management System">
+               <font>
+                  <Font size="11.0" />
+               </font></Label>
+                <Region HBox.hgrow="ALWAYS" />
+                <ToggleButton fx:id="themeToggle" onAction="#handleChangeMode" prefWidth="63.0" text="Dark" />
             </children>
             <padding>
-                <Insets bottom="10.0" left="12.0" right="12.0" top="10.0"/>
+                <Insets bottom="10.0" left="12.0" right="12.0" top="10.0" />
             </padding>
         </HBox>
 
         <!-- Messages -->
-        <ScrollPane fx:id="scrollPane" fitToWidth="true" hbarPolicy="NEVER" vbarPolicy="AS_NEEDED"
-                    AnchorPane.bottomAnchor="74.0"
-                    AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="52.0">
+        <ScrollPane fx:id="scrollPane" fitToWidth="true" hbarPolicy="NEVER" vbarPolicy="AS_NEEDED" AnchorPane.bottomAnchor="74.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="52.0">
             <content>
-                <VBox fx:id="dialogContainer" fillWidth="true" spacing="6.0" styleClass="dialog-container"/>
+                <VBox fx:id="dialogContainer" fillWidth="true" spacing="6.0" styleClass="dialog-container" />
             </content>
         </ScrollPane>
 
         <!-- Input Bar -->
-        <HBox spacing="8.0" styleClass="input-bar" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0"
-              AnchorPane.rightAnchor="0.0">
+        <HBox spacing="8.0" styleClass="input-bar" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
             <children>
-                <TextArea fx:id="userInput" prefRowCount="2" promptText="Type a message" wrapText="true"
-                          styleClass="input-text" HBox.hgrow="ALWAYS"/>
-                <Button fx:id="sendButton" onAction="#handleUserInput" text="Send"/>
+                <TextArea fx:id="userInput" prefRowCount="2" promptText="Type a message" styleClass="input-text" wrapText="true" HBox.hgrow="ALWAYS" />
+                <Button fx:id="sendButton" onAction="#handleUserInput" text="Send" />
             </children>
             <padding>
-                <Insets bottom="12.0" left="12.0" right="12.0" top="10.0"/>
+                <Insets bottom="12.0" left="12.0" right="12.0" top="10.0" />
             </padding>
         </HBox>
     </children>
