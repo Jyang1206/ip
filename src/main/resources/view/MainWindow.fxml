@@ -10,7 +10,7 @@
         <!-- Header -->
         <HBox layoutY="5.0" spacing="10.0" styleClass="header" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="5.0">
             <children>
-                <Label contentDisplay="BOTTOM" prefHeight="19.0" prefWidth="313.0" styleClass="title" text="UberSuper - Task/Client Management System">
+                <Label contentDisplay="BOTTOM" prefHeight="19.0" prefWidth="313.0" styleClass="title" text="UberSuper - Task/Client Management">
                <font>
                   <Font size="11.0" />
                </font></Label>

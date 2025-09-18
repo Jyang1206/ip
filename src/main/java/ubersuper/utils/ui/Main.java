@@ -30,6 +30,7 @@ public class Main extends Application {
             MainWindow controller = fxmlLoader.<MainWindow>getController();
             assert controller != null : "MainWindow.fxml should have a valid controller";
             controller.setUberSuper(uberSuper); //inject the UberSuper instance
+            stage.setTitle("UberSuper");
             stage.show();
         } catch (IOException e) {
             e.printStackTrace();

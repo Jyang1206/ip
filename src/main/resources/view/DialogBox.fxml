@@ -9,9 +9,9 @@
          stylesheets="@../css/dialog-box.css" type="javafx.scene.layout.HBox" xmlns="http://javafx.com/javafx/17"
          xmlns:fx="http://javafx.com/fxml/1">
     <children>
-        <VBox spacing="4.0" HBox.hgrow="ALWAYS">
+        <VBox spacing="4.0">
             <children>
-                <Label fx:id="dialog" minHeight="-Infinity" styleClass="message-label" text="Label" wrapText="true">
+                <Label fx:id="dialog" minHeight="-Infinity" styleClass="message-label" text="Label" wrapText="true" maxWidth="280.0">
                     <padding>
                         <Insets bottom="6.0" left="8.0" right="8.0" top="6.0"/>
                     </padding>
@@ -25,7 +25,7 @@
                 <Label fx:id="timestamp" styleClass="timestamp" text="00:00"/>
             </children>
         </VBox>
-        <ImageView id="displayPicture" fx:id="displayPicture" fitHeight="99.0" fitWidth="99.0" pickOnBounds="true"
+        <ImageView id="displayPicture" fx:id="displayPicture" fitHeight="48.0" fitWidth="48.0" pickOnBounds="true"
                    preserveRatio="true"/>
     </children>
     <padding>
