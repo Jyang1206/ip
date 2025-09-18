@@ -8,6 +8,7 @@
 
 .title {
     -fx-font-size: 15px;
+    -fx-font-weight: bold;
     -fx-text-fill: -color-text;
 }
 
