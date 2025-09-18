@@ -162,7 +162,7 @@ public class Ui {
         sb.append("Here are the available commands:" + nl + nl);
         sb.append("Tasks:" + nl);
         sb.append(LINE + nl);
-        sb.append("'list' - Show all tasks" + nl);
+        sb.append("'listtask' - Show all tasks" + nl);
         sb.append(LINE + nl);
         sb.append("'todo' <desc> - Add a todo" + nl);
         sb.append(LINE + nl);
@@ -170,7 +170,7 @@ public class Ui {
         sb.append(LINE + nl);
         sb.append("'event <d> /from <s> /to <e>' - Add an event with start/end" + nl);
         sb.append(LINE + nl);
-        sb.append("'delete <idx>' - Delete task by number" + nl);
+        sb.append("'deletetask <idx>' - Delete task by number" + nl);
         sb.append(LINE + nl);
         sb.append("'mark <idx>' - Mark task done" + nl);
         sb.append(LINE + nl);
@@ -183,7 +183,7 @@ public class Ui {
 
         sb.append("Clients:" + nl);
         sb.append(LINE + nl);
-        sb.append("'clientlist' - Show all clients" + nl);
+        sb.append("'listclient' - Show all clients" + nl);
         sb.append(LINE + nl);
         sb.append("'addclient <name> /phone <p> /email <e>' - Add a client" + nl);
         sb.append(LINE + nl);

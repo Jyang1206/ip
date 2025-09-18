@@ -1,7 +1,6 @@
 package ubersuper.clients;
 
 import ubersuper.exceptions.UberExceptions;
-import ubersuper.tasks.Task;
 import ubersuper.utils.Parser;
 import ubersuper.utils.storage.ClientStorage;
 import ubersuper.utils.storage.DataStorage;
@@ -18,7 +17,7 @@ import java.util.stream.IntStream;
  * <p>
  * Responsibilities:
  * <ul>
- *   <li>Holds tasks in memory (extends {@code ArrayList<Task>}).</li>
+ *   <li>Holds clients in memory (extends {@code ArrayList<Client>}).</li>
  *   <li>Implements command behaviors: {@code list}, {@code todo}, {@code deadline},
  *       {@code event}, {@code delete}, {@code mark}, {@code unmark}, {@code onDate}.</li>
  *   <li>Stores changes to {@link DataStorage} after any state change.</li>
@@ -33,7 +32,7 @@ public class ClientList extends ArrayList<Client> {
     }
 
     /**
-     * Stores the current list and prints the "added" confirmation for the provided task.
+     * Stores the current list and prints the "added" confirmation for the provided client.
      *
      * @param c the Client that was just added
      * @return String message
@@ -48,7 +47,7 @@ public class ClientList extends ArrayList<Client> {
     }
 
     /**
-     * Returns a String of all tasks with their 1-based indices.
+     * Returns a String of all clients with their 1-based indices.
      */
     public String list() {
         String clients = IntStream.range(0, this.size())
@@ -99,7 +98,7 @@ public class ClientList extends ArrayList<Client> {
      * </pre>
      *
      * @return String message
-     * Matching is OR across keywords: a task is listed if its description contains at least one keyword.
+     * Matching is OR across keywords: a client is listed if its description contains at least one keyword.
      */
     public String find(String input) {
         String[] parts = input.split("\\s+", 2);
@@ -129,25 +128,11 @@ public class ClientList extends ArrayList<Client> {
         return String.format("Here are the clients %s in your list: \n", parts[1])
                 + matches;
     }
-    /**
-     * Stores the current list and prints the "added" confirmation for the provided task.
-     *
-     * @param t the task that was just added
-     * @return String message
-     */
-    public String save(Task t) {
-        assert t != null : "Task passed to save() must not be null";
-        String message = "";
-        clientStorage.save(this);
-        message += String.format("You now have %d clients in the list \n", this.size());
-        message = Ui.printLine() + "Got it! I've added this task:\n" + t + "\n" + message + Ui.printLine();
-        return message;
-    }
 
     /**
      * Adds the client to the current list and saves the client in {@link ClientStorage}.
      *
-     * @param input task that was just added
+     * @param input client that was just added
      * @return String message
      */
     public String add(String input) {
@@ -156,7 +141,7 @@ public class ClientList extends ArrayList<Client> {
             this.add(c);
             return this.save(c);
         } catch (UberExceptions e) {
-        return Ui.printLine() + e.getMessage() + "\n" + Ui.printLine();
+            return Ui.printLine() + e.getMessage() + "\n" + Ui.printLine();
         }
     }
 }
