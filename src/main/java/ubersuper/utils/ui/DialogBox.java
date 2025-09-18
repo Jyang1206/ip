@@ -57,11 +57,14 @@ public class DialogBox extends HBox {
     }
 
     public static DialogBox getUserDialog(String text, Image img) {
-        return new DialogBox(text, img);
+        var db = new DialogBox(text, img);
+        db.setAlignment(Pos.TOP_RIGHT);
+        return db;
     }
 
     public static DialogBox getUberDialog(String text, Image img) {
         var db = new DialogBox(text, img);
+        db.setAlignment(Pos.TOP_LEFT);
         db.flip();
         return db;
     }
@@ -69,6 +72,7 @@ public class DialogBox extends HBox {
     public static DialogBox getUberErrorDialog(String text, Image img) {
         var db = new DialogBox(text, img);
         db.dialog.getStyleClass().add("error-label");
+        db.setAlignment(Pos.TOP_LEFT);
         db.flip();
         return db;
     }
