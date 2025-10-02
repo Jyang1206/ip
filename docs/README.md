@@ -18,7 +18,7 @@ Start typing commands!
  - **todo `desc`**                     - Add a todo 
  - **deadline `desc` /by `time`**            - Add a deadline (e.g. 2025-12-31 18:00)
  - **eevent `desc` /from `start` /to `end`**     - Add an event with start/end
- - **deletetask `idx` **                - Delete task by number
+ - **deletetask** `idx`                 - Delete task by number
  - **mark `idx`**                      - Mark task as done
  - **unmark `idx`**                    - Mark task as not done
  - **onDate `yyyy-mm-dd`**             - Show items on a specific date
